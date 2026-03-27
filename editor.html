@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BizDynamite Visual Editor</title>
+
+<link href="https://cdn.jsdelivr.net/npm/grapesjs@0.21.13/dist/css/grapes.min.css" rel="stylesheet">
+
+<style>
+  body, html { margin: 0; height: 100%; overflow: hidden; }
+
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 48px; padding: 0 16px;
+    background: #1a1a2e; border-bottom: 1px solid #2a2a4a;
+    font-family: system-ui, sans-serif; color: #e0e0e0; z-index: 10;
+  }
+  .topbar-brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.05rem; }
+  .topbar-brand .icon {
+    width: 30px; height: 30px; background: linear-gradient(135deg, #6c5ce7, #00cec9);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: .85rem; font-weight: 900;
+  }
+
+  .page-tabs { display: flex; gap: 3px; background: rgba(255,255,255,.06); border-radius: 8px; padding: 3px; }
+  .page-tab {
+    padding: 5px 14px; border-radius: 6px; font-size: .78rem; font-weight: 600;
+    border: none; cursor: pointer; color: rgba(255,255,255,.5); background: transparent;
+    transition: .2s; font-family: system-ui, sans-serif; white-space: nowrap;
+  }
+  .page-tab:hover { color: rgba(255,255,255,.8); background: rgba(255,255,255,.06); }
+  .page-tab.active { background: #6c5ce7; color: #fff; }
+
+  .device-tabs { display: flex; gap: 2px; background: rgba(255,255,255,.06); border-radius: 8px; padding: 3px; }
+  .device-tab {
+    width: 34px; height: 28px; border-radius: 6px; border: none; cursor: pointer;
+    background: transparent; color: rgba(255,255,255,.5); font-size: 1rem;
+    display: flex; align-items: center; justify-content: center; transition: .2s;
+  }
+  .device-tab:hover { color: rgba(255,255,255,.8); background: rgba(255,255,255,.06); }
+  .device-tab.active { background: #6c5ce7; color: #fff; }
+
+  .modal-select {
+    padding: 5px 10px; border-radius: 6px; font-size: .78rem; font-weight: 600;
+    border: 1px solid #2a2a4a; cursor: pointer; color: #e0e0e0; background: #16213e;
+    font-family: system-ui, sans-serif;
+  }
+  .modal-select:focus { outline: none; border-color: #6c5ce7; }
+
+  .topbar-actions { display: flex; gap: 8px; }
+  .tb { padding: 7px 16px; border-radius: 6px; font-size: .82rem; font-weight: 600;
+    border: none; cursor: pointer; color: #fff; transition: .2s; display: flex; align-items: center; gap: 5px;
+    font-family: system-ui, sans-serif; }
+  .tb-save { background: #00b894; }
+  .tb-save:hover { background: #00a381; }
+  .tb-preview { background: #6c5ce7; }
+  .tb-preview:hover { background: #5a4bd1; }
+  .tb-secondary { background: rgba(255,255,255,.08); }
+  .tb-secondary:hover { background: rgba(255,255,255,.15); }
+
+  .editor-wrap { display: flex; height: calc(100vh - 48px); }
+
+  .gjs-one-bg { background-color: #1a1a2e !important; }
+  .gjs-two-color { color: #e0e0e0 !important; }
+  .gjs-three-bg { background-color: #6c5ce7 !important; }
+  .gjs-four-color, .gjs-four-color-h:hover { color: #a29bfe !important; }
+  .gjs-pn-panel { background-color: #16213e !important; border-color: #2a2a4a !important; }
+  .gjs-pn-views, .gjs-pn-views-container { background-color: #16213e !important; }
+  .gjs-block { color: #e0e0e0 !important; }
+  .gjs-block:hover { box-shadow: 0 2px 10px rgba(108,92,231,.3) !important; }
+  .gjs-sm-sector .gjs-sm-sector-title { background: #1a1a2e !important; color: #e0e0e0 !important; border-color: #2a2a4a !important; }
+  .gjs-clm-tags .gjs-sm-sector-title { background: #1a1a2e !important; }
+  .gjs-sm-property { color: #b0b0b0 !important; }
+  .gjs-field { background: #0f0f23 !important; color: #e0e0e0 !important; border-color: #2a2a4a !important; }
+  .gjs-field input, .gjs-field select, .gjs-field textarea { color: #e0e0e0 !important; }
+  .gjs-radio-item label { color: #b0b0b0 !important; }
+  .gjs-layer-name { color: #e0e0e0 !important; }
+  .gjs-layers { background: #16213e !important; }
+  .gjs-trt-trait { color: #b0b0b0 !important; }
+
+  .toast-msg {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(80px);
+    padding: 10px 22px; border-radius: 8px; font-size: .85rem; font-weight: 600;
+    z-index: 9999; opacity: 0; transition: .3s; pointer-events: none;
+    font-family: system-ui, sans-serif;
+  }
+  .toast-msg.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast-msg.success { background: #00b894; color: #fff; }
+  .toast-msg.warn { background: #fdcb6e; color: #1a1a2e; }
+  .toast-msg.error { background: #ff7675; color: #fff; }
+
+  .loading-overlay {
+    position: fixed; inset: 0; background: rgba(26,26,46,.95);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 9999; gap: 14px; font-family: system-ui, sans-serif; color: #e0e0e0;
+  }
+  .loading-overlay.done { display: none; }
+  .lds-ring { width: 40px; height: 40px; position: relative; }
+  .lds-ring div {
+    width: 32px; height: 32px; margin: 4px; border: 3px solid transparent;
+    border-top-color: #6c5ce7; border-radius: 50%; animation: lds .8s linear infinite; position: absolute;
+  }
+  @keyframes lds { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="icon">B</div>
+    <span>BizDynamite Editor</span>
+  </div>
+  <div class="page-tabs" id="pageTabs">
+    <button class="page-tab active" data-page="home">Home</button>
+    <button class="page-tab" data-page="shop">Shop</button>
+    <button class="page-tab" data-page="about">About</button>
+    <button class="page-tab" data-page="contact">Contact</button>
+    <button class="page-tab" data-page="checkout">Checkout</button>
+  </div>
+  <div class="device-tabs" id="deviceTabs">
+    <button class="device-tab active" data-device="Desktop" title="Desktop">&#128421;</button>
+    <button class="device-tab" data-device="Tablet" title="Tablet">&#128195;</button>
+    <button class="device-tab" data-device="Mobile" title="Mobile">&#128241;</button>
+  </div>
+  <div class="modal-tabs" id="modalTabs">
+    <select id="modalSelect" class="modal-select" title="Edit hidden overlays">
+      <option value="">Edit Overlays...</option>
+      <option value="productModal">Product Modal</option>
+      <option value="authModal">Auth / Login Modal</option>
+      <option value="cartSidebar">Cart Sidebar</option>
+      <option value="searchOverlay">Search Overlay</option>
+    </select>
+  </div>
+  <div class="topbar-actions">
+    <button class="tb tb-secondary" id="btnUndo" title="Undo (Ctrl+Z)">&#8630; Undo</button>
+    <button class="tb tb-secondary" id="btnRedo" title="Redo (Ctrl+Shift+Z)">&#8631; Redo</button>
+    <button class="tb tb-preview" id="btnTogglePreview">&#9655; Preview</button>
+    <button class="tb tb-secondary" id="btnExport">&#8681; Export</button>
+    <button class="tb tb-save" id="btnSave">&#10003; Save</button>
+  </div>
+</div>
+
+<div class="editor-wrap">
+  <div id="gjs" style="flex:1;overflow:hidden;"></div>
+</div>
+
+<div class="toast-msg" id="toastEl"></div>
+
+<div class="loading-overlay" id="loader">
+  <div class="lds-ring"><div></div></div>
+  <div>Loading your app into the editor...</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/grapesjs@0.21.13/dist/grapes.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/grapesjs-preset-webpage@1.0.3/dist/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/grapesjs-blocks-basic@1.0.2/dist/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/grapesjs-plugin-forms@2.0.6/dist/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/grapesjs-style-bg@2.0.2/dist/index.js"></script>
+
+<script id="editorScript">
+(function() {
+  'use strict';
+
+  var gjsEditor = null;
+  var savedScripts = [];
+  var savedHeadMeta = '';
+  var savedOriginalCSS = '';
+  var protectedIds = [];
+  var protectedClasses = [];
+  var inlineHandlersMap = {};
+  var savedSourceHTML = '';
+  var currentPage = 'home';
+
+  /* ─── Toast helper ─── */
+  function toast(type, msg) {
+    var el = document.getElementById('toastEl');
+    el.textContent = msg;
+    el.className = 'toast-msg ' + type + ' show';
+    clearTimeout(el._t);
+    el._t = setTimeout(function() { el.classList.remove('show'); }, 2500);
+  }
+
+  /* ─── Parse source HTML for metadata (scripts, CSS, head, protections) ─── */
+  function parseSourceMeta(html) {
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(html, 'text/html');
+
+    /* Extract scripts */
+    var scripts = [];
+    doc.querySelectorAll('script').forEach(function(s) {
+      scripts.push({
+        src: s.getAttribute('src'),
+        content: s.textContent,
+        type: s.getAttribute('type')
+      });
+      s.remove();
+    });
+
+    /* Extract CSS */
+    var css = '';
+    doc.querySelectorAll('style').forEach(function(s) {
+      css += s.textContent + '\n';
+      s.remove();
+    });
+
+    /* Head meta */
+    var headMeta = doc.head.innerHTML.trim();
+
+    /* Analyze JS for protected IDs and classes */
+    var jsText = scripts.map(function(s) { return s.content || ''; }).join('\n');
+    var pIds = new Set();
+    var pClasses = new Set();
+    var m;
+
+    var r1 = /getElementById\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+    while ((m = r1.exec(jsText)) !== null) pIds.add(m[1]);
+
+    var r2 = /querySelector(?:All)?\s*\(\s*['"]#([a-zA-Z][\w-]*)['"]\s*\)/g;
+    while ((m = r2.exec(jsText)) !== null) pIds.add(m[1]);
+
+    var r3 = /querySelector(?:All)?\s*\(\s*['"]\.([a-zA-Z][\w-]*)['"]\s*\)/g;
+    while ((m = r3.exec(jsText)) !== null) pClasses.add(m[1]);
+
+    return {
+      scripts: scripts,
+      css: css,
+      headMeta: headMeta,
+      protectedIds: Array.from(pIds),
+      protectedClasses: Array.from(pClasses)
+    };
+  }
+
+  /* ─── Render source in hidden iframe to get fully-rendered HTML ─── */
+  function renderViaIframe(sourceHTML) {
+    return new Promise(function(resolve) {
+      var iframe = document.createElement('iframe');
+      iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:1280px;height:900px;border:none;visibility:hidden;';
+      document.body.appendChild(iframe);
+
+      var resolved = false;
+
+      function doExtract() {
+        if (resolved) return;
+        resolved = true;
+
+        var iDoc;
+        try { iDoc = iframe.contentDocument; } catch(e) { resolve({ bodyHTML: '', handlerMap: {} }); return; }
+
+        /* Remove scripts and styles from the rendered DOM */
+        iDoc.querySelectorAll('script').forEach(function(s) { s.remove(); });
+        iDoc.querySelectorAll('style').forEach(function(s) { s.remove(); });
+
+        /* Remove any runtime-generated toasts or transient elements */
+        var tc = iDoc.getElementById('toastContainer');
+        if (tc) tc.innerHTML = '';
+
+        /* Map every element with inline on* handlers → data-biz-id + data-on* */
+        var handlerMap = {};
+        var counter = 0;
+        iDoc.body.querySelectorAll('*').forEach(function(el) {
+          var handlers = {};
+          var hasHandler = false;
+          var attrs = el.attributes;
+          for (var i = 0; i < attrs.length; i++) {
+            if (/^on[a-z]/.test(attrs[i].name)) {
+              handlers[attrs[i].name] = attrs[i].value;
+              hasHandler = true;
+            }
+          }
+          if (hasHandler) {
+            var bizId = 'biz-' + counter++;
+            el.setAttribute('data-biz-id', bizId);
+            handlerMap[bizId] = handlers;
+            /* Convert on* to data-on* so GrapesJS preserves them,
+               then remove original on* attributes */
+            Object.keys(handlers).forEach(function(h) {
+              el.setAttribute('data-' + h, handlers[h]);
+              el.removeAttribute(h);
+            });
+          }
+        });
+
+        var bodyHTML = iDoc.body.innerHTML;
+
+        /* Cleanup */
+        try { document.body.removeChild(iframe); } catch(e) {}
+
+        resolve({ bodyHTML: bodyHTML, handlerMap: handlerMap });
+      }
+
+      /* Write source HTML into the iframe – JS executes, DOMContentLoaded fires */
+      var iDoc = iframe.contentDocument;
+      iDoc.open();
+      iDoc.write(sourceHTML);
+      iDoc.close();
+
+      /* Give rendering a moment (DOMContentLoaded fires synchronously on close,
+         but product images/layout may need a tick) */
+      setTimeout(doExtract, 600);
+
+      /* Hard fallback */
+      setTimeout(function() { doExtract(); }, 5000);
+    });
+  }
+
+  /* ─── Protect JS-linked elements in GrapesJS ─── */
+  function protectElements() {
+    var wrapper = gjsEditor.getWrapper();
+    var count = 0;
+
+    function walk(comp) {
+      var attrs = comp.getAttributes();
+      var id = attrs.id;
+      var classes = comp.getClasses();
+      var shouldProtect = false;
+
+      if (id && protectedIds.indexOf(id) !== -1) shouldProtect = true;
+
+      if (!shouldProtect) {
+        for (var i = 0; i < classes.length; i++) {
+          if (protectedClasses.indexOf(classes[i]) !== -1) { shouldProtect = true; break; }
+        }
+      }
+
+      if (!shouldProtect && attrs['data-biz-id']) {
+        shouldProtect = true;
+      }
+
+      if (shouldProtect) {
+        comp.set({
+          removable: false,
+          draggable: false,
+          copyable: false,
+          stylable: true,
+          highlightable: true,
+          badgable: true
+        });
+        var tag = comp.get('tagName') || 'el';
+        var label = id ? '#' + id : tag;
+        comp.set('custom-name', 'LOCK ' + label);
+        count++;
+      }
+
+      comp.components().forEach(walk);
+    }
+
+    walk(wrapper);
+    console.log('Protected ' + count + ' JS-linked elements');
+  }
+
+  /* ─── Reassemble edited HTML into a working standalone page ─── */
+  function reassemble() {
+    var gjsCSS = gjsEditor.getCss();
+
+    /* Use the ORIGINAL source HTML as the base — it has all elements,
+       inline handlers, SVGs, scripts, and CSS intact. This avoids
+       issues where GrapesJS mangles buttons, strips SVGs, or removes
+       elements that JS depends on (like cartCount, cartItems, etc.).
+
+       GrapesJS CSS overrides are injected as an additional <style> block
+       so visual edits (colors, fonts, sizes, layout) are reflected. */
+
+    if (!gjsCSS || gjsCSS.trim() === '' || gjsCSS.trim() === '* { box-sizing: border-box; } body {margin: 0;}') {
+      return savedSourceHTML;
+    }
+
+    var overrideStyle = '\n<' + 'style>\n/* === Visual editor overrides === */\n' + gjsCSS + '\n<' + '/style>';
+    return savedSourceHTML.replace('<' + '/head>', overrideStyle + '\n<' + '/head>');
+  }
+
+  /* ─── Switch visible page in the editor canvas ─── */
+  function switchEditorPage(page) {
+    if (!gjsEditor) return;
+    var canvasDoc;
+    try { canvasDoc = gjsEditor.Canvas.getDocument(); } catch(e) { return; }
+    if (!canvasDoc) return;
+
+    /* Inject CSS override to show only the target page */
+    var existing = canvasDoc.getElementById('biz-editor-page-css');
+    if (existing) existing.remove();
+
+    var style = canvasDoc.createElement('style');
+    style.id = 'biz-editor-page-css';
+    style.textContent = '.page-content { display: none !important; } #page-' + page + ' { display: block !important; }';
+    canvasDoc.head.appendChild(style);
+
+    /* Scroll canvas to top of the page */
+    try {
+      gjsEditor.Canvas.getFrameEl().contentWindow.scrollTo(0, 0);
+    } catch(e) {}
+
+    /* Update tab buttons */
+    document.querySelectorAll('.page-tab').forEach(function(btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-page') === page);
+    });
+
+    currentPage = page;
+  }
+
+  /* ─── Preview in new tab ─── */
+  function togglePreview() {
+    var fullDoc = reassemble();
+    var blob = new Blob([fullDoc], { type: 'text/html' });
+    var url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+    toast('success', 'Preview opened in new tab');
+  }
+
+  /* ─── Save to localStorage ─── */
+  function handleSave() {
+    try {
+      var data = {
+        html: gjsEditor.getHtml(),
+        css: gjsEditor.getCss(),
+        timestamp: Date.now()
+      };
+      localStorage.setItem('bizdynamite-project', JSON.stringify(data));
+      localStorage.setItem('bizdynamite-handlers', JSON.stringify(inlineHandlersMap));
+      toast('success', 'Saved successfully');
+    } catch(e) {
+      toast('error', 'Save failed: ' + e.message);
+    }
+  }
+
+  /* ─── Export as downloadable file ─── */
+  function handleExport() {
+    var fullDoc = reassemble();
+    var blob = new Blob([fullDoc], { type: 'text/html' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'index-edited.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('success', 'Exported as index-edited.html');
+  }
+
+  /* ─── Boot sequence ─── */
+  function boot() {
+    fetch('index.html')
+      .then(function(r) {
+        if (!r.ok) throw new Error('Could not load index.html (' + r.status + ')');
+        return r.text();
+      })
+      .then(function(sourceHTML) {
+        /* Save original source for preview/export reassembly */
+        savedSourceHTML = sourceHTML;
+
+        /* Step 1: Parse source for scripts, CSS, head meta, protections */
+        var meta = parseSourceMeta(sourceHTML);
+        savedScripts = meta.scripts;
+        savedHeadMeta = meta.headMeta;
+        savedOriginalCSS = meta.css;
+        protectedIds = meta.protectedIds;
+        protectedClasses = meta.protectedClasses;
+
+        console.log('Source parsed:', {
+          scripts: meta.scripts.length,
+          cssLen: meta.css.length,
+          protectedIds: meta.protectedIds.length,
+          protectedClasses: meta.protectedClasses.length
+        });
+
+        /* Step 2: Render in iframe to get fully-rendered body HTML */
+        return renderViaIframe(sourceHTML);
+      })
+      .then(function(rendered) {
+        inlineHandlersMap = rendered.handlerMap;
+
+        console.log('Rendered:', {
+          bodyLen: rendered.bodyHTML.length,
+          handlers: Object.keys(rendered.handlerMap).length
+        });
+
+        /* Step 3: Check for saved state or use rendered HTML */
+        var savedProject = null;
+        try {
+          var raw = localStorage.getItem('bizdynamite-project');
+          if (raw) savedProject = JSON.parse(raw);
+        } catch(e) { savedProject = null; }
+
+        /* Also restore handler map from localStorage if available */
+        try {
+          var savedHandlers = localStorage.getItem('bizdynamite-handlers');
+          if (savedHandlers) {
+            var parsed = JSON.parse(savedHandlers);
+            /* Merge: keep iframe handlers as base, overlay saved ones */
+            Object.keys(parsed).forEach(function(k) {
+              if (!inlineHandlersMap[k]) inlineHandlersMap[k] = parsed[k];
+            });
+          }
+        } catch(e) {}
+
+        if (!savedProject) {
+          document.getElementById('gjs').innerHTML = rendered.bodyHTML;
+        }
+
+        gjsEditor = grapesjs.init({
+          container: '#gjs',
+          fromElement: !savedProject,
+          components: savedProject ? savedProject.html : undefined,
+          style: savedProject ? savedProject.css : undefined,
+          height: '100%',
+          width: 'auto',
+          storageManager: false,
+
+          plugins: [
+            'grapesjs-preset-webpage',
+            'gjs-blocks-basic',
+            'grapesjs-plugin-forms',
+            'grapesjs-style-bg'
+          ],
+          pluginsOpts: {
+            'grapesjs-preset-webpage': {
+              blocksBasicOpts: false,
+              formsOpts: false,
+              navbarOpts: false,
+              countdownOpts: false
+            },
+            'gjs-blocks-basic': { flexGrid: true },
+            'grapesjs-plugin-forms': {},
+            'grapesjs-style-bg': {}
+          },
+
+          canvas: {
+            styles: [],
+            scripts: []
+          },
+
+          styleManager: {
+            sectors: [
+              {
+                name: 'Layout',
+                open: true,
+                properties: [
+                  'display', 'position', 'top', 'right', 'bottom', 'left',
+                  'flex-direction', 'flex-wrap', 'justify-content', 'align-items',
+                  'align-content', 'order', 'flex-basis', 'flex-grow', 'flex-shrink',
+                  'align-self', 'gap', 'overflow', 'float', 'clear'
+                ]
+              },
+              {
+                name: 'Size',
+                open: false,
+                properties: [
+                  'width', 'height', 'max-width', 'max-height', 'min-width', 'min-height',
+                  'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
+                  'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left'
+                ]
+              },
+              {
+                name: 'Typography',
+                open: false,
+                properties: [
+                  'font-family', 'font-size', 'font-weight', 'font-style',
+                  'letter-spacing', 'line-height', 'text-align', 'text-decoration',
+                  'text-transform', 'text-shadow',
+                  { property: 'color', type: 'color' }
+                ]
+              },
+              {
+                name: 'Background',
+                open: false,
+                properties: [
+                  { property: 'background-color', type: 'color' },
+                  'background-image', 'background-repeat', 'background-position',
+                  'background-size', 'background-attachment'
+                ]
+              },
+              {
+                name: 'Borders',
+                open: false,
+                properties: [
+                  'border', 'border-width', 'border-style',
+                  { property: 'border-color', type: 'color' },
+                  'border-radius',
+                  'border-top-left-radius', 'border-top-right-radius',
+                  'border-bottom-left-radius', 'border-bottom-right-radius',
+                  'box-shadow'
+                ]
+              },
+              {
+                name: 'Effects',
+                open: false,
+                properties: [
+                  'opacity', 'cursor', 'transition', 'transform',
+                  { property: 'outline-color', type: 'color' }
+                ]
+              }
+            ]
+          },
+
+          deviceManager: {
+            devices: [
+              { name: 'Desktop', width: '' },
+              { name: 'Tablet', width: '768px', widthMedia: '992px' },
+              { name: 'Mobile', width: '375px', widthMedia: '480px' }
+            ]
+          }
+        });
+
+        /* ─── On editor load ─── */
+        gjsEditor.on('load', function() {
+          var canvasDoc = gjsEditor.Canvas.getDocument();
+
+          /* Inject original CSS into canvas so elements look right */
+          var styleEl = canvasDoc.createElement('style');
+          styleEl.id = 'biz-original-css';
+          styleEl.textContent = savedOriginalCSS;
+          canvasDoc.head.appendChild(styleEl);
+
+          /* Protect JS-linked elements */
+          protectElements();
+
+          /* Setup page tab click handlers */
+          document.querySelectorAll('.page-tab').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+              switchEditorPage(btn.getAttribute('data-page'));
+            });
+          });
+
+          /* Hide loading overlay */
+          document.getElementById('loader').classList.add('done');
+          console.log('Editor ready');
+        });
+
+        /* Prevent deletion of protected elements */
+        gjsEditor.on('component:remove', function(model) {
+          if (model.get('removable') === false) {
+            toast('warn', 'Protected element — cannot delete (linked to JavaScript)');
+            setTimeout(function() { gjsEditor.UndoManager.undo(); }, 0);
+          }
+        });
+
+        /* Toolbar buttons */
+        document.getElementById('btnUndo').onclick = function() { gjsEditor.UndoManager.undo(); };
+        document.getElementById('btnRedo').onclick = function() { gjsEditor.UndoManager.redo(); };
+        document.getElementById('btnSave').onclick = handleSave;
+        document.getElementById('btnExport').onclick = handleExport;
+        document.getElementById('btnTogglePreview').onclick = togglePreview;
+
+        /* Device switching (responsive preview) */
+        document.querySelectorAll('.device-tab').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var deviceName = btn.getAttribute('data-device');
+            gjsEditor.setDevice(deviceName);
+            document.querySelectorAll('.device-tab').forEach(function(b) {
+              b.classList.toggle('active', b === btn);
+            });
+          });
+        });
+
+        /* Modal / overlay visibility toggle for editing */
+        var activeOverlayId = '';
+        document.getElementById('modalSelect').addEventListener('change', function() {
+          var canvasDoc;
+          try { canvasDoc = gjsEditor.Canvas.getDocument(); } catch(e) { return; }
+          if (!canvasDoc) return;
+
+          /* Remove previous overlay-edit CSS */
+          var prev = canvasDoc.getElementById('biz-overlay-edit-css');
+          if (prev) prev.remove();
+
+          var overlayId = this.value;
+          activeOverlayId = overlayId;
+
+          if (!overlayId) {
+            toast('success', 'Overlays hidden');
+            return;
+          }
+
+          /* Inject CSS to make the selected overlay visible and editable */
+          var css = '';
+          if (overlayId === 'cartSidebar') {
+            css = '#cartOverlay { display: block !important; opacity: .4; }' +
+                  '#cartSidebar { transform: translateX(0) !important; right: 0 !important; }';
+          } else if (overlayId === 'searchOverlay') {
+            css = '#searchOverlay { display: flex !important; }';
+          } else {
+            /* productModal, authModal — both use .modal-overlay with display:none → flex */
+            css = '#' + overlayId + ' { display: flex !important; }';
+          }
+
+          var style = canvasDoc.createElement('style');
+          style.id = 'biz-overlay-edit-css';
+          style.textContent = css;
+          canvasDoc.head.appendChild(style);
+
+          var labels = { productModal: 'Product Modal', authModal: 'Auth Modal', cartSidebar: 'Cart Sidebar', searchOverlay: 'Search Overlay' };
+          toast('success', (labels[overlayId] || overlayId) + ' visible — click elements to edit');
+        });
+
+        /* Ctrl+S shortcut */
+        document.addEventListener('keydown', function(e) {
+          if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+            e.preventDefault();
+            handleSave();
+          }
+        });
+      })
+      .catch(function(err) {
+        console.error('Boot failed:', err);
+        var loader = document.getElementById('loader');
+        loader.innerHTML = '<div style="color:#ff7675;font-size:1.3rem;font-weight:700;">Failed to load' +
+          '<' + '/div><div style="color:#8892b0;margin-top:10px;">' + err.message +
+          '<' + '/div><div style="color:#8892b0;margin-top:6px;">Ensure index.html is in the same folder and served via HTTP.<' + '/div>';
+      });
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
