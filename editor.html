@@ -179,6 +179,7 @@
   var protectedClasses = [];
   var inlineHandlersMap = {};
   var savedSourceHTML = '';
+  var savedRenderedBodyHTML = '';
   var currentPage = 'home';
   var pageSectionClass = 'page-content';
   var pageIdPrefix = 'page-';
@@ -390,10 +391,6 @@
         }
       }
 
-      if (!shouldProtect && attrs['data-biz-id']) {
-        shouldProtect = true;
-      }
-
       if (shouldProtect) {
         comp.set({
           removable: false,
@@ -416,76 +413,66 @@
     console.log('Protected ' + count + ' JS-linked elements');
   }
 
-  /* ─── Reassemble edited HTML into a working standalone page ─── */
-  function reassemble() {
-    var gjsHTML = gjsEditor.getHtml();
-    var gjsCSS = gjsEditor.getCss();
+  /* ─── Collect CSS overrides from GrapesJS component tree ─── */
+  function collectStyleOverrides() {
+    var rules = [];
+    var wrapper = gjsEditor.DomComponents.getWrapper();
+    if (!wrapper) return '';
 
-    /* Restore inline event handlers that GrapesJS stripped.
-       Elements tagged with data-biz-id have their original handlers
-       stored in inlineHandlersMap. We also read data-on* attributes
-       as a fallback. */
-    var parser = new DOMParser();
-    var tempDoc = parser.parseFromString('<' + 'body>' + gjsHTML + '<' + '/body>', 'text/html');
-
-    tempDoc.querySelectorAll('[data-biz-id]').forEach(function(el) {
-      var bizId = el.getAttribute('data-biz-id');
-      var handlers = inlineHandlersMap[bizId];
-      if (handlers) {
-        Object.keys(handlers).forEach(function(h) {
-          el.setAttribute(h, handlers[h]);
+    function buildSelector(comp) {
+      var attrs = comp.getAttributes();
+      var id = attrs.id;
+      /* Skip GrapesJS wrapper */
+      if (id && id.indexOf('wrapper') === -1) return '#' + id;
+      var classes = comp.getClasses();
+      if (classes.length > 0) {
+        /* Filter out GrapesJS auto-generated classes */
+        var origClasses = classes.filter(function(c) {
+          return c.length > 2 && !/^(gjs-|c\d+$)/.test(c);
         });
+        if (origClasses.length > 0) {
+          var tag = (comp.get('tagName') || '').toLowerCase();
+          return (tag ? tag : '') + '.' + origClasses.join('.');
+        }
       }
-      /* Also check data-on* attributes as fallback */
-      var attrs = el.attributes;
-      for (var i = 0; i < attrs.length; i++) {
-        var name = attrs[i].name;
-        if (name.indexOf('data-on') === 0 && name !== 'data-biz-id') {
-          var realName = name.replace('data-', '');
-          if (!el.hasAttribute(realName)) {
-            el.setAttribute(realName, attrs[i].value);
+      return null;
+    }
+
+    function walkComponents(comp) {
+      var style = comp.getStyle();
+      if (style && Object.keys(style).length > 0) {
+        var sel = buildSelector(comp);
+        if (sel) {
+          var props = [];
+          Object.keys(style).forEach(function(prop) {
+            props.push('  ' + prop + ': ' + style[prop] + ';');
+          });
+          if (props.length > 0) {
+            rules.push(sel + ' {\n' + props.join('\n') + '\n}');
           }
         }
       }
-    });
-
-    var restoredBody = tempDoc.body.innerHTML;
-
-    /* Remove editor-injected CSS artifacts (page switching, overlay editing) */
-    var cleanCSS = (gjsCSS || '').replace(/#biz-editor-page-css[^}]*\}/g, '').replace(/#biz-overlay-edit-css[^}]*\}/g, '');
-
-    /* Build the full document using:
-       - Original <head> meta (title, meta tags)
-       - Original CSS (all styles from source)
-       - GrapesJS CSS overrides (user's visual edits)
-       - Restored body HTML (with handlers re-applied)
-       - Original scripts (all JS functionality) */
-    var out = '<!DOCTYPE html>\n<html lang="en">\n<head>\n';
-    out += savedHeadMeta + '\n';
-    out += '<' + 'style>\n' + savedOriginalCSS + '\n<' + '/style>\n';
-
-    if (cleanCSS && cleanCSS.trim() !== '' && cleanCSS.trim() !== '* { box-sizing: border-box; } body {margin: 0;}') {
-      out += '<' + 'style>\n/* === Visual editor overrides === */\n' + cleanCSS + '\n<' + '/style>\n';
+      comp.components().forEach(walkComponents);
     }
 
-    out += '<' + '/head>\n<body>\n';
-    out += restoredBody + '\n';
+    walkComponents(wrapper);
+    return rules.join('\n\n');
+  }
 
-    /* Re-inject original scripts */
-    savedScripts.forEach(function(s) {
-      if (s.src) {
-        out += '<' + 'script src="' + s.src + '"';
-        if (s.type) out += ' type="' + s.type + '"';
-        out += '><' + '/script>\n';
-      } else if (s.content) {
-        out += '<' + 'script';
-        if (s.type) out += ' type="' + s.type + '"';
-        out += '>\n' + s.content + '\n<' + '/script>\n';
-      }
-    });
+  /* ─── Reassemble edited HTML into a working standalone page ─── */
+  function reassemble() {
+    /* Collect CSS overrides by walking the component tree
+       to generate selectors that work with the original HTML */
+    var overrideCSS = collectStyleOverrides();
 
-    out += '<' + '/body>\n<' + '/html>';
-    return out;
+    /* If no visual edits were made, return the original file unchanged */
+    if (!overrideCSS) {
+      return savedSourceHTML;
+    }
+
+    /* Inject GrapesJS CSS overrides into the <head> of the original file */
+    var overrideStyle = '\n<' + 'style>\n/* === Visual editor overrides === */\n' + overrideCSS + '\n<' + '/style>';
+    return savedSourceHTML.replace('</head>', overrideStyle + '\n</head>');
   }
 
   /* ─── Switch visible page in the editor canvas ─── */
@@ -632,6 +619,7 @@
       })
       .then(function(rendered) {
         inlineHandlersMap = rendered.handlerMap;
+        savedRenderedBodyHTML = rendered.bodyHTML;
 
         console.log('Rendered:', {
           bodyLen: rendered.bodyHTML.length,
@@ -673,7 +661,20 @@
           plugins: [
             'grapesjs-preset-webpage',
             'gjs-blocks-basic',
-            'grapesjs-style-bg'
+            'grapesjs-style-bg',
+            function(editor) {
+              /* Prevent GrapesJS from converting form elements to special
+                 component types that mangle content (buttons become "Send") */
+              var dc = editor.DomComponents;
+              ['button', 'label', 'input', 'textarea', 'select', 'form',
+               'checkbox', 'radio', 'map', 'video'].forEach(function(typeName) {
+                try {
+                  dc.addType(typeName, {
+                    isComponent: function() { return false; }
+                  });
+                } catch(e) {}
+              });
+            }
           ],
           pluginsOpts: {
             'grapesjs-preset-webpage': {
