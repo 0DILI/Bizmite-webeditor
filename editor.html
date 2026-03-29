@@ -136,10 +136,7 @@
   <div class="modal-tabs" id="modalTabs">
     <select id="modalSelect" class="modal-select" title="Edit hidden overlays">
       <option value="">Edit Overlays...</option>
-      <option value="productModal">Product Modal</option>
-      <option value="authModal">Auth / Login Modal</option>
-      <option value="cartSidebar">Cart Sidebar</option>
-      <option value="searchOverlay">Search Overlay</option>
+      <!-- Populated dynamically from source HTML -->
     </select>
   </div>
   <div class="topbar-actions">
@@ -183,6 +180,13 @@
   var currentPage = 'home';
   var pageSectionClass = 'page-content';
   var pageIdPrefix = 'page-';
+  var detectedOverlays = [];
+
+  /* ─── Determine which file to edit from URL ?file= parameter ─── */
+  var urlParams = new URLSearchParams(window.location.search);
+  var sourceFile = urlParams.get('file') || 'index.html';
+  var storageKey = 'bizdynamite-project-' + sourceFile;
+  var handlersKey = 'bizdynamite-handlers-' + sourceFile;
 
   /* ─── Toast helper ─── */
   function toast(type, msg) {
@@ -236,19 +240,28 @@
 
     /* Extract navigation items from <nav> */
     var navItems = [];
+    var navigateFn = '';
     var navEl = doc.querySelector('nav') || doc.querySelector('#mainNav') || doc.querySelector('.nav');
     if (navEl) {
       /* Try data-page attributes first */
       navEl.querySelectorAll('a[data-page]').forEach(function(a) {
         navItems.push({ page: a.getAttribute('data-page'), label: a.textContent.trim() });
       });
-      /* Fallback: parse onclick="showPage('xxx')" from nav links */
+      /* Also extract navigate function name from onclick handlers */
+      navEl.querySelectorAll('a[onclick]').forEach(function(a) {
+        if (navigateFn) return;
+        var onc = a.getAttribute('onclick') || '';
+        var fm = onc.match(/(\w+)\s*\(\s*['"]/);
+        if (fm) navigateFn = fm[1];
+      });
+      /* Fallback: parse onclick="fnName('xxx')" from nav links if no data-page */
       if (navItems.length === 0) {
         navEl.querySelectorAll('a[onclick]').forEach(function(a) {
           var onc = a.getAttribute('onclick') || '';
-          var pm = onc.match(/showPage\s*\(\s*['"]([^'"]+)['"]\s*\)/);
+          var pm = onc.match(/(\w+)\s*\(\s*['"]([^'"]+)['"]\s*\)/);
           if (pm) {
-            navItems.push({ page: pm[1], label: a.textContent.trim() });
+            if (!navigateFn) navigateFn = pm[1];
+            navItems.push({ page: pm[2], label: a.textContent.trim() });
           }
         });
       }
@@ -271,12 +284,30 @@
     /* Detect page section class and ID prefix pattern */
     var pageSectionClass = 'page-content';
     var pageIdPrefix = 'page-';
+    var isSPA = false;
+    var appContainerId = '';
     var firstSection = doc.querySelector('[class*="page-"][id]');
     if (firstSection) {
       var cls = Array.from(firstSection.classList).filter(function(c) { return c !== 'active'; });
       if (cls.length > 0) pageSectionClass = cls[0];
       var idMatch = firstSection.id.match(/^(.+?-)/);
       if (idMatch) pageIdPrefix = idMatch[1];
+    } else {
+      /* No static page containers found — check for SPA pattern */
+      /* Look for a main content container that JS renders into */
+      var spaContainers = ['app', 'root', 'main-content', 'content', 'page'];
+      for (var si = 0; si < spaContainers.length; si++) {
+        var candidate = doc.getElementById(spaContainers[si]);
+        if (candidate) { appContainerId = spaContainers[si]; break; }
+      }
+      /* Also check <main> with an id */
+      if (!appContainerId) {
+        var mainEl = doc.querySelector('main[id]');
+        if (mainEl) appContainerId = mainEl.id;
+      }
+      if (appContainerId && navigateFn && navItems.length > 0) {
+        isSPA = true;
+      }
     }
 
     /* Extract logo HTML */
@@ -286,6 +317,54 @@
       logoHTML = logoEl.innerHTML;
     }
 
+    /* ─── Auto-detect overlays/modals/sidebars ─── */
+    var overlays = [];
+    var seenOverlayIds = {};
+
+    /* Strategy: find elements that are hidden overlays (modals, sidebars, search overlays, etc.)
+       by looking for common patterns in class names and CSS properties */
+    var overlaySelectors = [
+      '[class*="modal"][id]',
+      '[class*="overlay"][id]',
+      '[class*="sidebar"][id]',
+      '[class*="drawer"][id]',
+      '[class*="popup"][id]',
+      '[class*="lightbox"][id]',
+      '[class*="offcanvas"][id]',
+      '[class*="sheet"][id]'
+    ];
+
+    overlaySelectors.forEach(function(sel) {
+      doc.querySelectorAll(sel).forEach(function(el) {
+        var id = el.id;
+        if (!id || seenOverlayIds[id]) return;
+        /* Skip page-content sections — those are pages, not overlays */
+        if (el.classList.contains(pageSectionClass)) return;
+
+        seenOverlayIds[id] = true;
+
+        /* Determine the overlay type for CSS show logic */
+        var classList = Array.from(el.classList).join(' ').toLowerCase();
+        var type = 'modal'; /* default */
+        if (classList.indexOf('sidebar') !== -1 || classList.indexOf('drawer') !== -1 || classList.indexOf('offcanvas') !== -1) {
+          type = 'sidebar';
+        } else if (classList.indexOf('search') !== -1) {
+          type = 'search';
+        } else if (classList.indexOf('cart-overlay') !== -1 || (classList.indexOf('overlay') !== -1 && classList.indexOf('modal') === -1)) {
+          type = 'backdrop'; /* a backdrop layer, not the main overlay container */
+        }
+
+        /* Generate a human-readable label from the ID */
+        var label = id
+          .replace(/([A-Z])/g, ' $1')          /* camelCase → spaced */
+          .replace(/[-_]/g, ' ')                 /* kebab/snake → spaced */
+          .replace(/\b\w/g, function(c) { return c.toUpperCase(); })  /* capitalize words */
+          .trim();
+
+        overlays.push({ id: id, label: label, type: type });
+      });
+    });
+
     return {
       scripts: scripts,
       css: css,
@@ -293,14 +372,18 @@
       protectedIds: Array.from(pIds),
       protectedClasses: Array.from(pClasses),
       navItems: navItems,
+      navigateFn: navigateFn,
       logoHTML: logoHTML,
       pageSectionClass: pageSectionClass,
-      pageIdPrefix: pageIdPrefix
+      pageIdPrefix: pageIdPrefix,
+      isSPA: isSPA,
+      appContainerId: appContainerId,
+      overlays: overlays
     };
   }
 
   /* ─── Render source in hidden iframe to get fully-rendered HTML ─── */
-  function renderViaIframe(sourceHTML) {
+  function renderViaIframe(sourceHTML, meta) {
     return new Promise(function(resolve) {
       var iframe = document.createElement('iframe');
       iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:1280px;height:900px;border:none;visibility:hidden;';
@@ -308,22 +391,7 @@
 
       var resolved = false;
 
-      function doExtract() {
-        if (resolved) return;
-        resolved = true;
-
-        var iDoc;
-        try { iDoc = iframe.contentDocument; } catch(e) { resolve({ bodyHTML: '', handlerMap: {} }); return; }
-
-        /* Remove scripts and styles from the rendered DOM */
-        iDoc.querySelectorAll('script').forEach(function(s) { s.remove(); });
-        iDoc.querySelectorAll('style').forEach(function(s) { s.remove(); });
-
-        /* Remove any runtime-generated toasts or transient elements */
-        var tc = iDoc.getElementById('toastContainer');
-        if (tc) tc.innerHTML = '';
-
-        /* Map every element with inline on* handlers → data-biz-id + data-on* */
+      function tagHandlers(iDoc) {
         var handlerMap = {};
         var counter = 0;
         iDoc.body.querySelectorAll('*').forEach(function(el) {
@@ -340,19 +408,100 @@
             var bizId = 'biz-' + counter++;
             el.setAttribute('data-biz-id', bizId);
             handlerMap[bizId] = handlers;
-            /* Convert on* to data-on* so GrapesJS preserves them,
-               then remove original on* attributes */
             Object.keys(handlers).forEach(function(h) {
               el.setAttribute('data-' + h, handlers[h]);
               el.removeAttribute(h);
             });
           }
         });
+        return handlerMap;
+      }
 
+      function doExtract() {
+        if (resolved) return;
+        resolved = true;
+
+        var iDoc;
+        try { iDoc = iframe.contentDocument; } catch(e) { resolve({ bodyHTML: '', handlerMap: {} }); return; }
+
+        /* Remove scripts and styles from the rendered DOM */
+        iDoc.querySelectorAll('script').forEach(function(s) { s.remove(); });
+        iDoc.querySelectorAll('style').forEach(function(s) { s.remove(); });
+
+        /* Remove any runtime-generated toasts or transient elements */
+        var tc = iDoc.getElementById('toastContainer') || iDoc.getElementById('toast-container');
+        if (tc) tc.innerHTML = '';
+
+        /* Check if this is a SPA that needs multi-page extraction */
+        if (meta && meta.isSPA && meta.appContainerId && meta.navigateFn && meta.navItems.length > 0) {
+          doSPAExtract(iDoc, iframe);
+          return;
+        }
+
+        /* Static pages: tag handlers and extract body as-is */
+        var handlerMap = tagHandlers(iDoc);
         var bodyHTML = iDoc.body.innerHTML;
-
-        /* Cleanup */
         try { document.body.removeChild(iframe); } catch(e) {}
+        resolve({ bodyHTML: bodyHTML, handlerMap: handlerMap });
+      }
+
+      function doSPAExtract(iDoc, iframe) {
+        var iWin = iframe.contentWindow;
+        var appEl = iDoc.getElementById(meta.appContainerId);
+        if (!appEl) {
+          /* Fallback: not really SPA, extract normally */
+          var handlerMap = tagHandlers(iDoc);
+          var bodyHTML = iDoc.body.innerHTML;
+          try { document.body.removeChild(iframe); } catch(e) {}
+          resolve({ bodyHTML: bodyHTML, handlerMap: handlerMap });
+          return;
+        }
+
+        var pages = {};
+        var pageOrder = meta.navItems.map(function(ni) { return ni.page; });
+        var idx = 0;
+
+        function renderNextPage() {
+          if (idx >= pageOrder.length) {
+            finishSPA(iDoc, iframe, appEl, pages, pageOrder);
+            return;
+          }
+          var pageName = pageOrder[idx];
+          idx++;
+          /* Call the navigate function in the iframe context */
+          try {
+            iWin[meta.navigateFn](pageName);
+          } catch(e) {
+            console.warn('Could not call ' + meta.navigateFn + '("' + pageName + '"):', e);
+          }
+          /* Wait for render to complete */
+          setTimeout(function() {
+            pages[pageName] = appEl.innerHTML;
+            renderNextPage();
+          }, 150);
+        }
+
+        renderNextPage();
+      }
+
+      function finishSPA(iDoc, iframe, appEl, pages, pageOrder) {
+        /* Build synthetic page containers inside the app element */
+        var syntheticHTML = '';
+        pageOrder.forEach(function(pageName, i) {
+          var activeClass = (i === 0) ? ' active' : '';
+          syntheticHTML += '<div class="page-content' + activeClass + '" id="page-' + pageName + '">' +
+            (pages[pageName] || '') + '</div>';
+        });
+        appEl.innerHTML = syntheticHTML;
+
+        /* Now tag handlers across the full body */
+        var handlerMap = tagHandlers(iDoc);
+        var bodyHTML = iDoc.body.innerHTML;
+        try { document.body.removeChild(iframe); } catch(e) {}
+
+        /* Set the page section class and prefix so switchEditorPage works */
+        pageSectionClass = 'page-content';
+        pageIdPrefix = 'page-';
 
         resolve({ bodyHTML: bodyHTML, handlerMap: handlerMap });
       }
@@ -413,66 +562,76 @@
     console.log('Protected ' + count + ' JS-linked elements');
   }
 
-  /* ─── Collect CSS overrides from GrapesJS component tree ─── */
-  function collectStyleOverrides() {
-    var rules = [];
-    var wrapper = gjsEditor.DomComponents.getWrapper();
-    if (!wrapper) return '';
-
-    function buildSelector(comp) {
-      var attrs = comp.getAttributes();
-      var id = attrs.id;
-      /* Skip GrapesJS wrapper */
-      if (id && id.indexOf('wrapper') === -1) return '#' + id;
-      var classes = comp.getClasses();
-      if (classes.length > 0) {
-        /* Filter out GrapesJS auto-generated classes */
-        var origClasses = classes.filter(function(c) {
-          return c.length > 2 && !/^(gjs-|c\d+$)/.test(c);
-        });
-        if (origClasses.length > 0) {
-          var tag = (comp.get('tagName') || '').toLowerCase();
-          return (tag ? tag : '') + '.' + origClasses.join('.');
-        }
-      }
-      return null;
-    }
-
-    function walkComponents(comp) {
-      var style = comp.getStyle();
-      if (style && Object.keys(style).length > 0) {
-        var sel = buildSelector(comp);
-        if (sel) {
-          var props = [];
-          Object.keys(style).forEach(function(prop) {
-            props.push('  ' + prop + ': ' + style[prop] + ';');
-          });
-          if (props.length > 0) {
-            rules.push(sel + ' {\n' + props.join('\n') + '\n}');
-          }
-        }
-      }
-      comp.components().forEach(walkComponents);
-    }
-
-    walkComponents(wrapper);
-    return rules.join('\n\n');
-  }
-
   /* ─── Reassemble edited HTML into a working standalone page ─── */
   function reassemble() {
-    /* Collect CSS overrides by walking the component tree
-       to generate selectors that work with the original HTML */
-    var overrideCSS = collectStyleOverrides();
+    var gjsCSS = gjsEditor.getCss();
 
-    /* If no visual edits were made, return the original file unchanged */
-    if (!overrideCSS) {
+    /* Filter out GrapesJS boilerplate — if only boilerplate remains, no edits were made */
+    var cleaned = (gjsCSS || '').replace(/\*\s*\{\s*box-sizing:\s*border-box;\s*\}/g, '')
+                                .replace(/body\s*\{\s*margin:\s*0;\s*\}/g, '')
+                                .trim();
+
+    if (!cleaned) {
       return savedSourceHTML;
     }
 
-    /* Inject GrapesJS CSS overrides into the <head> of the original file */
-    var overrideStyle = '\n<' + 'style>\n/* === Visual editor overrides === */\n' + overrideCSS + '\n<' + '/style>';
-    return savedSourceHTML.replace('</head>', overrideStyle + '\n</head>');
+    /* ── Build output from GrapesJS HTML + original CSS + overrides + scripts ──
+       GrapesJS getCss() uses auto-generated IDs (e.g. #iv7k) as selectors for
+       elements that had no explicit id. Those IDs only exist in GrapesJS's own
+       component tree / getHtml() output — NOT in savedSourceHTML. Injecting
+       the CSS into savedSourceHTML therefore does nothing because the selectors
+       never match. By using getHtml() as the body source, the auto-IDs are
+       present and the CSS overrides actually apply. */
+    var gjsBody = gjsEditor.getHtml();
+
+    /* Restore inline event handlers that GrapesJS stripped during parsing */
+    var tempDiv = document.createElement('div');
+    tempDiv.innerHTML = gjsBody;
+    tempDiv.querySelectorAll('[data-biz-id]').forEach(function(el) {
+      var bizId = el.getAttribute('data-biz-id');
+      var handlers = inlineHandlersMap[bizId];
+      if (handlers) {
+        Object.keys(handlers).forEach(function(h) {
+          el.setAttribute(h, handlers[h]);
+        });
+      }
+      /* Fallback: restore from data-on* attributes if map entry is missing */
+      for (var i = el.attributes.length - 1; i >= 0; i--) {
+        var attr = el.attributes[i];
+        if (attr.name.indexOf('data-on') === 0 && attr.name !== 'data-biz-id') {
+          var realName = attr.name.replace('data-', '');
+          if (!el.hasAttribute(realName)) {
+            el.setAttribute(realName, attr.value);
+          }
+        }
+      }
+    });
+    var restoredBody = tempDiv.innerHTML;
+
+    /* Build the full document: head meta + original CSS + overrides + body + scripts
+       NOTE: Every HTML closing tag inside this JS string MUST be split via
+       concatenation ('<' + '/tag>') so the browser's HTML parser does not
+       mistake it for the end of the editor's own <script> block. */
+    var out = '<!DOCTYPE html>\n<html>\n<head>\n';
+    out += savedHeadMeta + '\n';
+    out += '<' + 'style>\n' + savedOriginalCSS + '\n<' + '/style>\n';
+    out += '<' + 'style>\n/* === Visual editor overrides === */\n' + cleaned + '\n<' + '/style>\n';
+    out += '<' + '/head>\n<body>\n';
+    out += restoredBody + '\n';
+    savedScripts.forEach(function(s) {
+      if (s.src) {
+        out += '<' + 'script src="' + s.src + '"';
+        if (s.type) out += ' type="' + s.type + '"';
+        out += '><' + '/script>\n';
+      } else if (s.content) {
+        out += '<' + 'script';
+        if (s.type) out += ' type="' + s.type + '"';
+        out += '>\n' + s.content + '\n<' + '/script>\n';
+      }
+    });
+    out += '<' + '/body>\n<' + '/html>';
+
+    return out;
   }
 
   /* ─── Switch visible page in the editor canvas ─── */
@@ -543,8 +702,8 @@
         css: gjsEditor.getCss(),
         timestamp: Date.now()
       };
-      localStorage.setItem('bizdynamite-project', JSON.stringify(data));
-      localStorage.setItem('bizdynamite-handlers', JSON.stringify(inlineHandlersMap));
+      localStorage.setItem(storageKey, JSON.stringify(data));
+      localStorage.setItem(handlersKey, JSON.stringify(inlineHandlersMap));
       toast('success', 'Saved successfully');
     } catch(e) {
       toast('error', 'Save failed: ' + e.message);
@@ -558,19 +717,20 @@
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url;
-    a.download = 'index-edited.html';
+    var exportName = sourceFile.replace(/\.html?$/i, '') + '-edited.html';
+    a.download = exportName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast('success', 'Exported as index-edited.html');
+    toast('success', 'Exported as ' + exportName);
   }
 
   /* ─── Boot sequence ─── */
   function boot() {
-    fetch('index.html')
+    fetch(sourceFile)
       .then(function(r) {
-        if (!r.ok) throw new Error('Could not load index.html (' + r.status + ')');
+        if (!r.ok) throw new Error('Could not load ' + sourceFile + ' (' + r.status + ')');
         return r.text();
       })
       .then(function(sourceHTML) {
@@ -592,7 +752,10 @@
           cssLen: meta.css.length,
           protectedIds: meta.protectedIds.length,
           protectedClasses: meta.protectedClasses.length,
-          navItems: meta.navItems.length
+          navItems: meta.navItems.length,
+          isSPA: meta.isSPA,
+          navigateFn: meta.navigateFn,
+          appContainer: meta.appContainerId
         });
 
         /* Populate page tabs dynamically from source navigation */
@@ -615,8 +778,23 @@
           brand.innerHTML = '<div class="source-logo">' + meta.logoHTML + '</div>';
         }
 
+        /* Populate overlay dropdown dynamically */
+        detectedOverlays = meta.overlays;
+        var modalSelect = document.getElementById('modalSelect');
+        if (meta.overlays.length > 0) {
+          meta.overlays.forEach(function(ov) {
+            var opt = document.createElement('option');
+            opt.value = ov.id;
+            opt.textContent = ov.label;
+            modalSelect.appendChild(opt);
+          });
+        } else {
+          /* No overlays detected — hide the dropdown entirely */
+          document.getElementById('modalTabs').style.display = 'none';
+        }
+
         /* Step 2: Render in iframe to get fully-rendered body HTML */
-        return renderViaIframe(sourceHTML);
+        return renderViaIframe(sourceHTML, meta);
       })
       .then(function(rendered) {
         inlineHandlersMap = rendered.handlerMap;
@@ -630,13 +808,13 @@
         /* Step 3: Check for saved state or use rendered HTML */
         var savedProject = null;
         try {
-          var raw = localStorage.getItem('bizdynamite-project');
+          var raw = localStorage.getItem(storageKey);
           if (raw) savedProject = JSON.parse(raw);
         } catch(e) { savedProject = null; }
 
         /* Also restore handler map from localStorage if available */
         try {
-          var savedHandlers = localStorage.getItem('bizdynamite-handlers');
+          var savedHandlers = localStorage.getItem(handlersKey);
           if (savedHandlers) {
             var parsed = JSON.parse(savedHandlers);
             /* Merge: keep iframe handlers as base, overlay saved ones */
@@ -772,7 +950,12 @@
           /* Inject original CSS into canvas so elements look right */
           var styleEl = canvasDoc.createElement('style');
           styleEl.id = 'biz-original-css';
-          styleEl.textContent = savedOriginalCSS;
+          var extraCSS = '';
+          /* For SPA apps, add CSS for synthetic page containers */
+          if (!savedOriginalCSS.match(/\.page-content\s*\{/) && document.querySelectorAll('.page-tab').length > 0) {
+            extraCSS = '\n.page-content { display: none; }\n.page-content.active { display: block; }\n';
+          }
+          styleEl.textContent = savedOriginalCSS + extraCSS;
           canvasDoc.head.appendChild(styleEl);
 
           /* Protect JS-linked elements */
@@ -784,6 +967,11 @@
               switchEditorPage(btn.getAttribute('data-page'));
             });
           });
+
+          /* Show the first page */
+          if (currentPage) {
+            switchEditorPage(currentPage);
+          }
 
           /* Hide loading overlay */
           document.getElementById('loader').classList.add('done');
@@ -835,15 +1023,26 @@
             return;
           }
 
-          /* Inject CSS to make the selected overlay visible and editable */
+          /* Find the overlay metadata to determine the right CSS to show it */
+          var overlayMeta = null;
+          for (var i = 0; i < detectedOverlays.length; i++) {
+            if (detectedOverlays[i].id === overlayId) { overlayMeta = detectedOverlays[i]; break; }
+          }
+
+          /* Generate CSS to make the overlay visible based on its type */
           var css = '';
-          if (overlayId === 'cartSidebar') {
-            css = '#cartOverlay { display: block !important; opacity: .4; }' +
-                  '#cartSidebar { transform: translateX(0) !important; right: 0 !important; }';
-          } else if (overlayId === 'searchOverlay') {
-            css = '#searchOverlay { display: flex !important; }';
+          if (overlayMeta && overlayMeta.type === 'sidebar') {
+            /* Sidebars are typically off-screen via transform/right/left — force them visible */
+            css = '#' + overlayId + ' { transform: none !important; right: 0 !important; left: auto !important; display: flex !important; }';
+            /* Also try to show the associated backdrop/overlay if it exists nearby */
+            var backdropOverlay = detectedOverlays.filter(function(o) { return o.type === 'backdrop'; });
+            backdropOverlay.forEach(function(bo) {
+              css += '\n#' + bo.id + ' { display: block !important; opacity: .4; }';
+            });
+          } else if (overlayMeta && overlayMeta.type === 'backdrop') {
+            css = '#' + overlayId + ' { display: block !important; }';
           } else {
-            /* productModal, authModal — both use .modal-overlay with display:none → flex */
+            /* Modals, search overlays, and everything else — display:flex covers most cases */
             css = '#' + overlayId + ' { display: flex !important; }';
           }
 
@@ -852,8 +1051,8 @@
           style.textContent = css;
           canvasDoc.head.appendChild(style);
 
-          var labels = { productModal: 'Product Modal', authModal: 'Auth Modal', cartSidebar: 'Cart Sidebar', searchOverlay: 'Search Overlay' };
-          toast('success', (labels[overlayId] || overlayId) + ' visible — click elements to edit');
+          var label = overlayMeta ? overlayMeta.label : overlayId;
+          toast('success', label + ' visible — click elements to edit');
         });
 
         /* Ctrl+S shortcut */
@@ -869,7 +1068,7 @@
         var loader = document.getElementById('loader');
         loader.innerHTML = '<div style="color:#ff7675;font-size:1.3rem;font-weight:700;">Failed to load' +
           '<' + '/div><div style="color:#8892b0;margin-top:10px;">' + err.message +
-          '<' + '/div><div style="color:#8892b0;margin-top:6px;">Ensure index.html is in the same folder and served via HTTP.<' + '/div>';
+          '<' + '/div><div style="color:#8892b0;margin-top:6px;">Ensure ' + sourceFile + ' is in the same folder and served via HTTP.<' + '/div>';
       });
   }
 
