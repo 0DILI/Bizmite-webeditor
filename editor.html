@@ -523,6 +523,7 @@
 
   function togglePreview() {
     var fullDoc = reassemble();
+    console.log(fullDoc, 'fullDoc');
 
     /* Revoke old blob to free memory */
     if (previewBlobUrl) {
