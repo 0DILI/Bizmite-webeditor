@@ -1,0 +1,2106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaGadget — Curated Tech You Can Trust</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+--primary:#6C5CE7;--primary-dark:#5A4BD1;--primary-light:#A29BFE;
+--accent:#00CEC9;--accent-dark:#00B5B0;
+--dark:#1A1A2E;--dark2:#16213E;--dark3:#0F3460;
+--text:#2D3436;--text-light:#636E72;--text-lighter:#B2BEC3;
+--bg:#F8F9FE;--white:#FFFFFF;--border:#E8E8F0;
+--success:#00B894;--warning:#FDCB6E;--danger:#FF7675;
+--shadow:0 2px 20px rgba(108,92,231,.08);
+--shadow-lg:0 8px 40px rgba(108,92,231,.12);
+--shadow-xl:0 20px 60px rgba(108,92,231,.15);
+--radius:12px;--radius-lg:20px;--radius-sm:8px;
+--transition:all .3s cubic-bezier(.4,0,.2,1);
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;font-family:inherit}
+input,select,textarea{font-family:inherit;outline:none}
+img{max-width:100%;display:block}
+.container{max-width:1280px;margin:0 auto;padding:0 24px}
+
+/* HEADER */
+.header{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);transition:var(--transition)}
+.header.scrolled{box-shadow:var(--shadow)}
+.header-inner{display:flex;align-items:center;justify-content:space-between;height:72px;max-width:1280px;margin:0 auto;padding:0 24px}
+.logo{display:flex;align-items:center;gap:10px;font-size:1.5rem;font-weight:800;color:var(--dark)}
+.logo-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-size:1.2rem;font-weight:900}
+.logo span{background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav{display:flex;align-items:center;gap:32px}
+.nav a{font-weight:500;color:var(--text-light);transition:var(--transition);position:relative;font-size:.95rem}
+.nav a:hover,.nav a.active{color:var(--primary)}
+.nav a.active::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:2px;background:var(--primary);border-radius:2px}
+.header-actions{display:flex;align-items:center;gap:16px}
+.header-btn{width:42px;height:42px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;background:transparent;transition:var(--transition);position:relative;color:var(--text)}
+.header-btn:hover{background:var(--bg);color:var(--primary)}
+.header-btn svg{width:22px;height:22px}
+.cart-count{position:absolute;top:2px;right:2px;width:18px;height:18px;background:var(--primary);color:white;font-size:.65rem;font-weight:700;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.btn{padding:12px 28px;border-radius:var(--radius-sm);font-weight:600;font-size:.9rem;transition:var(--transition);display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;box-shadow:0 4px 15px rgba(108,92,231,.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 25px rgba(108,92,231,.4)}
+.btn-secondary{background:var(--white);color:var(--primary);border:2px solid var(--primary)}
+.btn-secondary:hover{background:var(--primary);color:var(--white)}
+.btn-accent{background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:white;box-shadow:0 4px 15px rgba(0,206,201,.3)}
+.btn-accent:hover{transform:translateY(-2px);box-shadow:0 6px 25px rgba(0,206,201,.4)}
+.btn-sm{padding:8px 20px;font-size:.85rem}
+.btn-lg{padding:16px 36px;font-size:1rem}
+.btn-block{width:100%;justify-content:center}
+.btn-outline{background:transparent;border:2px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+.mobile-toggle{display:none;flex-direction:column;gap:5px;background:none;padding:8px}
+.mobile-toggle span{width:24px;height:2px;background:var(--text);border-radius:2px;transition:var(--transition)}
+
+/* HERO */
+.hero{padding:140px 0 80px;background:linear-gradient(160deg,#F8F9FE 0%,#EDE7F6 40%,#E0F7FA 100%);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(108,92,231,.08) 0%,transparent 70%);border-radius:50%}
+.hero::after{content:'';position:absolute;bottom:-100px;left:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(0,206,201,.06) 0%,transparent 70%);border-radius:50%}
+.hero-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(108,92,231,.1);color:var(--primary);padding:8px 16px;border-radius:50px;font-size:.85rem;font-weight:600;margin-bottom:20px}
+.hero-badge .dot{width:8px;height:8px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{font-size:3.5rem;font-weight:800;line-height:1.15;color:var(--dark);margin-bottom:20px}
+.hero h1 .highlight{background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:1.15rem;color:var(--text-light);margin-bottom:32px;max-width:520px;line-height:1.8}
+.hero-ctas{display:flex;gap:16px;margin-bottom:40px}
+.hero-stats{display:flex;gap:40px}
+.hero-stat{text-align:center}
+.hero-stat .num{font-size:1.8rem;font-weight:800;color:var(--dark)}
+.hero-stat .label{font-size:.8rem;color:var(--text-light);text-transform:uppercase;letter-spacing:1px}
+.hero-visual{position:relative;display:flex;justify-content:center}
+.hero-img-wrapper{position:relative;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-xl)}
+.hero-img-wrapper img{width:100%;height:480px;object-fit:cover}
+.hero-float-card{position:absolute;background:var(--white);border-radius:var(--radius);padding:16px 20px;box-shadow:var(--shadow-lg);animation:float 3s ease-in-out infinite}
+.hero-float-card.card1{top:20px;right:-30px;animation-delay:0s}
+.hero-float-card.card2{bottom:40px;left:-30px;animation-delay:1.5s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.float-card-inner{display:flex;align-items:center;gap:12px}
+.float-card-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.float-card-icon.green{background:rgba(0,184,148,.1);color:var(--success)}
+.float-card-icon.purple{background:rgba(108,92,231,.1);color:var(--primary)}
+.float-card-text h4{font-size:.85rem;font-weight:700;color:var(--dark)}
+.float-card-text p{font-size:.75rem;color:var(--text-light)}
+
+/* TRUST BAR */
+.trust-bar{padding:40px 0;background:var(--white);border-bottom:1px solid var(--border)}
+.trust-bar-inner{display:flex;align-items:center;justify-content:center;gap:48px;flex-wrap:wrap}
+.trust-item{display:flex;align-items:center;gap:10px;color:var(--text-light);font-size:.9rem;font-weight:500}
+.trust-item svg{width:20px;height:20px;color:var(--primary)}
+
+/* SECTIONS */
+.section{padding:80px 0}
+.section-header{text-align:center;margin-bottom:48px}
+.section-header .tag{display:inline-block;background:rgba(108,92,231,.1);color:var(--primary);padding:6px 16px;border-radius:50px;font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.section-header h2{font-size:2.4rem;font-weight:800;color:var(--dark);margin-bottom:12px}
+.section-header p{font-size:1.05rem;color:var(--text-light);max-width:600px;margin:0 auto}
+
+/* CATEGORIES */
+.categories-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.category-card{background:var(--white);border-radius:var(--radius-lg);padding:32px 24px;text-align:center;transition:var(--transition);border:2px solid transparent;cursor:pointer;position:relative;overflow:hidden}
+.category-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--primary)}
+.category-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--primary),var(--accent));opacity:0;transition:var(--transition)}
+.category-card:hover::before{opacity:1}
+.category-icon{width:72px;height:72px;margin:0 auto 16px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(108,92,231,.08),rgba(0,206,201,.08))}
+.category-icon img{width:40px;height:40px;object-fit:contain}
+.category-card h3{font-size:1.1rem;font-weight:700;color:var(--dark);margin-bottom:8px}
+.category-card p{font-size:.85rem;color:var(--text-light)}
+.category-card .count{display:inline-block;margin-top:12px;font-size:.8rem;font-weight:600;color:var(--primary);background:rgba(108,92,231,.08);padding:4px 12px;border-radius:50px}
+
+/* PRODUCTS */
+.products-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:16px}
+.filter-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.filter-tab{padding:8px 20px;border-radius:50px;font-size:.85rem;font-weight:600;background:var(--white);color:var(--text-light);border:1px solid var(--border);transition:var(--transition)}
+.filter-tab:hover,.filter-tab.active{background:var(--primary);color:var(--white);border-color:var(--primary)}
+.sort-select{padding:10px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:.85rem;background:var(--white);color:var(--text);min-width:180px}
+.products-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.product-card{background:var(--white);border-radius:var(--radius-lg);overflow:hidden;transition:var(--transition);border:1px solid var(--border);position:relative}
+.product-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:transparent}
+.product-badges{position:absolute;top:12px;left:12px;display:flex;flex-direction:column;gap:6px;z-index:2}
+.product-badge{padding:4px 10px;border-radius:50px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.badge-tested{background:var(--success);color:white}
+.badge-new{background:var(--primary);color:white}
+.badge-popular{background:var(--warning);color:var(--dark)}
+.badge-sale{background:var(--danger);color:white}
+.product-wishlist{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;z-index:2;transition:var(--transition);border:none}
+.product-wishlist:hover,.product-wishlist.active{background:var(--danger);color:white}
+.product-wishlist svg{width:18px;height:18px}
+.product-img{width:100%;height:220px;object-fit:cover;transition:var(--transition)}
+.product-card:hover .product-img{transform:scale(1.03)}
+.product-img-wrapper{overflow:hidden;position:relative}
+.product-quick-add{position:absolute;bottom:0;left:0;right:0;padding:12px;background:linear-gradient(transparent,rgba(0,0,0,.6));transform:translateY(100%);transition:var(--transition);display:flex;justify-content:center}
+.product-card:hover .product-quick-add{transform:translateY(0)}
+.product-info{padding:20px}
+.product-category{font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--primary);font-weight:600;margin-bottom:6px}
+.product-name{font-size:1rem;font-weight:700;color:var(--dark);margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4}
+.product-rating{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.stars{display:flex;gap:2px}
+.star{color:var(--warning);font-size:.85rem}
+.star.empty{color:var(--border)}
+.rating-count{font-size:.8rem;color:var(--text-light)}
+.product-price{display:flex;align-items:center;gap:10px}
+.price-current{font-size:1.2rem;font-weight:800;color:var(--dark)}
+.price-original{font-size:.9rem;color:var(--text-lighter);text-decoration:line-through}
+.price-discount{font-size:.8rem;font-weight:600;color:var(--danger);background:rgba(255,118,117,.1);padding:2px 8px;border-radius:50px}
+.product-footer{display:flex;align-items:center;justify-content:space-between;padding:0 20px 20px;gap:8px}
+.nova-score{display:flex;align-items:center;gap:4px;font-size:.8rem;font-weight:600;color:var(--accent)}
+.nova-score svg{width:14px;height:14px}
+
+/* PRODUCT DETAIL MODAL */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:2000;display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px)}
+.modal-overlay.active{display:flex}
+.modal{background:var(--white);border-radius:var(--radius-lg);max-width:960px;width:100%;max-height:90vh;overflow-y:auto;position:relative;animation:modalIn .3s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.modal-close{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:10;transition:var(--transition);border:none;font-size:1.2rem}
+.modal-close:hover{background:var(--danger);color:white}
+.modal-body{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.modal-gallery{padding:32px;background:var(--bg)}
+.modal-gallery img{width:100%;height:380px;object-fit:cover;border-radius:var(--radius)}
+.modal-details{padding:32px}
+.modal-details .product-category{margin-bottom:4px}
+.modal-details h2{font-size:1.6rem;font-weight:800;color:var(--dark);margin-bottom:12px}
+.modal-details .product-rating{margin-bottom:16px}
+.modal-details .description{font-size:.95rem;color:var(--text-light);margin-bottom:20px;line-height:1.7}
+.modal-details .price-section{margin-bottom:24px;padding:16px;background:var(--bg);border-radius:var(--radius-sm)}
+.modal-details .price-current{font-size:1.8rem}
+.specs-list{list-style:none;margin-bottom:24px}
+.specs-list li{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:.9rem}
+.specs-list li svg{width:16px;height:16px;color:var(--success);flex-shrink:0}
+.quantity-selector{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.quantity-selector label{font-size:.9rem;font-weight:600;color:var(--text)}
+.qty-controls{display:flex;align-items:center;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden}
+.qty-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--bg);font-size:1rem;font-weight:600;transition:var(--transition);border:none}
+.qty-btn:hover{background:var(--primary);color:white}
+.qty-value{width:48px;text-align:center;font-weight:600;border:none;background:white;font-size:.95rem}
+.modal-actions{display:flex;gap:12px}
+.nova-score-detail{display:flex;align-items:center;gap:12px;padding:16px;background:linear-gradient(135deg,rgba(0,206,201,.08),rgba(108,92,231,.08));border-radius:var(--radius-sm);margin-bottom:20px}
+.score-circle{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--primary));display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:1.1rem;flex-shrink:0}
+.score-text h4{font-size:.85rem;font-weight:700;color:var(--dark)}
+.score-text p{font-size:.75rem;color:var(--text-light)}
+
+/* WHY SECTION */
+.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px}
+.why-card{text-align:center;padding:40px 32px;background:var(--white);border-radius:var(--radius-lg);transition:var(--transition);border:1px solid var(--border)}
+.why-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--primary)}
+.why-icon{width:80px;height:80px;margin:0 auto 20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem}
+.why-icon.i1{background:linear-gradient(135deg,rgba(108,92,231,.1),rgba(108,92,231,.05))}
+.why-icon.i2{background:linear-gradient(135deg,rgba(0,206,201,.1),rgba(0,206,201,.05))}
+.why-icon.i3{background:linear-gradient(135deg,rgba(253,203,110,.1),rgba(253,203,110,.05))}
+.why-icon img{width:36px;height:36px;object-fit:contain}
+.why-card h3{font-size:1.2rem;font-weight:700;color:var(--dark);margin-bottom:10px}
+.why-card p{font-size:.9rem;color:var(--text-light);line-height:1.7}
+
+/* TESTING PROCESS */
+.process-section{background:linear-gradient(160deg,var(--dark) 0%,var(--dark2) 50%,var(--dark3) 100%);color:white;padding:80px 0}
+.process-section .section-header h2{color:white}
+.process-section .section-header p{color:rgba(255,255,255,.6)}
+.process-section .section-header .tag{background:rgba(108,92,231,.3)}
+.process-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;position:relative}
+.process-step{text-align:center;padding:32px 20px;position:relative}
+.step-num{width:48px;height:48px;margin:0 auto 16px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem}
+.process-step h3{font-size:1.05rem;font-weight:700;margin-bottom:8px}
+.process-step p{font-size:.85rem;color:rgba(255,255,255,.6);line-height:1.6}
+
+/* TESTIMONIALS */
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.testimonial-card{background:var(--white);border-radius:var(--radius-lg);padding:32px;border:1px solid var(--border);transition:var(--transition)}
+.testimonial-card:hover{box-shadow:var(--shadow-lg)}
+.testimonial-stars{display:flex;gap:2px;margin-bottom:16px;color:var(--warning)}
+.testimonial-text{font-size:.95rem;color:var(--text-light);line-height:1.7;margin-bottom:20px;font-style:italic}
+.testimonial-author{display:flex;align-items:center;gap:12px}
+.testimonial-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover}
+.testimonial-info h4{font-size:.9rem;font-weight:700;color:var(--dark)}
+.testimonial-info p{font-size:.8rem;color:var(--text-light)}
+
+/* NEWSLETTER */
+.newsletter{background:linear-gradient(135deg,var(--primary),var(--dark3));padding:60px 0;text-align:center;color:white}
+.newsletter h2{font-size:2rem;font-weight:800;margin-bottom:10px}
+.newsletter p{font-size:1rem;opacity:.8;margin-bottom:28px}
+.newsletter-form{display:flex;max-width:500px;margin:0 auto;gap:12px}
+.newsletter-form input{flex:1;padding:14px 20px;border-radius:var(--radius-sm);border:none;font-size:.95rem;background:rgba(255,255,255,.15);color:white}
+.newsletter-form input::placeholder{color:rgba(255,255,255,.6)}
+.newsletter-form button{padding:14px 28px;border-radius:var(--radius-sm);background:var(--accent);color:white;font-weight:700;font-size:.9rem;border:none;white-space:nowrap;transition:var(--transition)}
+.newsletter-form button:hover{background:var(--accent-dark);transform:translateY(-2px)}
+
+/* CART SIDEBAR */
+.cart-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:3000;display:none;backdrop-filter:blur(4px)}
+.cart-overlay.active{display:block}
+.cart-sidebar{position:fixed;top:0;right:-480px;width:460px;height:100vh;background:var(--white);z-index:3001;box-shadow:var(--shadow-xl);transition:var(--transition);display:flex;flex-direction:column}
+.cart-sidebar.active{right:0}
+.cart-header{padding:24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.cart-header h3{font-size:1.2rem;font-weight:700}
+.cart-items{flex:1;overflow-y:auto;padding:16px 24px}
+.cart-empty{text-align:center;padding:60px 20px}
+.cart-empty img{width:120px;height:120px;margin:0 auto 20px;opacity:.4}
+.cart-empty h4{font-size:1.1rem;color:var(--text-light);margin-bottom:8px}
+.cart-item{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--border)}
+.cart-item-img{width:80px;height:80px;border-radius:var(--radius-sm);object-fit:cover;flex-shrink:0}
+.cart-item-info{flex:1}
+.cart-item-name{font-size:.9rem;font-weight:600;color:var(--dark);margin-bottom:4px}
+.cart-item-price{font-size:.95rem;font-weight:700;color:var(--primary)}
+.cart-item-qty{display:flex;align-items:center;gap:8px;margin-top:8px}
+.cart-item-qty button{width:28px;height:28px;border-radius:6px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:.9rem;border:none;transition:var(--transition)}
+.cart-item-qty button:hover{background:var(--primary);color:white}
+.cart-item-qty span{font-weight:600;font-size:.9rem;min-width:20px;text-align:center}
+.cart-item-remove{background:none;color:var(--text-lighter);transition:var(--transition);padding:4px;border:none}
+.cart-item-remove:hover{color:var(--danger)}
+.cart-footer{padding:24px;border-top:1px solid var(--border);background:var(--bg)}
+.cart-summary{margin-bottom:16px}
+.cart-summary-row{display:flex;justify-content:space-between;margin-bottom:8px;font-size:.9rem;color:var(--text-light)}
+.cart-summary-row.total{font-size:1.1rem;font-weight:700;color:var(--dark);padding-top:12px;border-top:2px solid var(--border)}
+.cart-summary-row.total span:last-child{color:var(--primary)}
+
+/* CHECKOUT */
+.page-content{display:none;padding:100px 0 60px;min-height:100vh}
+.page-content.active{display:block}
+.checkout-grid{display:grid;grid-template-columns:1fr 400px;gap:40px;align-items:start}
+.checkout-section{background:var(--white);border-radius:var(--radius-lg);padding:32px;border:1px solid var(--border);margin-bottom:24px}
+.checkout-section h3{font-size:1.2rem;font-weight:700;margin-bottom:20px;color:var(--dark);display:flex;align-items:center;gap:10px}
+.checkout-section h3 .step-badge{width:28px;height:28px;border-radius:50%;background:var(--primary);color:white;display:flex;align-items:center;justify-content:center;font-size:.8rem}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:.85rem;font-weight:600;color:var(--text);margin-bottom:6px}
+.form-group input,.form-group select{width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.9rem;transition:var(--transition);background:var(--white)}
+.form-group input:focus,.form-group select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(108,92,231,.1)}
+.form-group.full{grid-column:1/-1}
+.payment-methods{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.payment-method{display:flex;align-items:center;gap:12px;padding:16px;border:2px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:var(--transition)}
+.payment-method:hover,.payment-method.selected{border-color:var(--primary);background:rgba(108,92,231,.03)}
+.payment-method input[type="radio"]{accent-color:var(--primary)}
+.payment-method-info{flex:1}
+.payment-method-info h4{font-size:.9rem;font-weight:600}
+.payment-method-info p{font-size:.8rem;color:var(--text-light)}
+.payment-method img{height:28px;width:auto}
+.order-summary{position:sticky;top:96px}
+.order-summary .checkout-section{background:var(--white)}
+.order-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.order-item img{width:60px;height:60px;border-radius:var(--radius-sm);object-fit:cover}
+.order-item-info{flex:1}
+.order-item-info h4{font-size:.85rem;font-weight:600;margin-bottom:2px}
+.order-item-info p{font-size:.8rem;color:var(--text-light)}
+.order-item-price{font-weight:700;font-size:.9rem;color:var(--dark)}
+.promo-code{display:flex;gap:8px;margin:16px 0}
+.promo-code input{flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.85rem}
+.gateway-config{background:var(--bg);border-radius:var(--radius-sm);padding:20px;margin-top:16px}
+.gateway-config h4{font-size:.9rem;font-weight:600;margin-bottom:12px;color:var(--dark)}
+.gateway-config .form-group{margin-bottom:12px}
+.gateway-config .form-group:last-child{margin-bottom:0}
+.gateway-config .note{font-size:.75rem;color:var(--text-light);background:rgba(108,92,231,.05);padding:10px;border-radius:6px;margin-top:12px}
+
+/* AUTH MODAL */
+.auth-modal .modal{max-width:440px}
+.auth-modal .modal-body{display:block;padding:40px}
+.auth-modal .modal-body h2{font-size:1.5rem;text-align:center;margin-bottom:8px}
+.auth-modal .modal-body .subtitle{text-align:center;color:var(--text-light);margin-bottom:28px;font-size:.9rem}
+.auth-tabs{display:flex;gap:0;margin-bottom:24px;background:var(--bg);border-radius:var(--radius-sm);padding:4px}
+.auth-tab{flex:1;padding:10px;text-align:center;font-weight:600;font-size:.9rem;border-radius:6px;background:transparent;color:var(--text-light);transition:var(--transition);border:none}
+.auth-tab.active{background:var(--white);color:var(--primary);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.divider{display:flex;align-items:center;gap:16px;margin:20px 0;color:var(--text-lighter);font-size:.85rem}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.social-btns{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.social-btn{width:100%;padding:12px;border-radius:var(--radius-sm);font-weight:600;font-size:.9rem;display:flex;align-items:center;justify-content:center;gap:10px;transition:var(--transition);border:1px solid var(--border);background:var(--white)}
+.social-btn:hover{border-color:var(--primary);background:rgba(108,92,231,.03)}
+
+/* SUCCESS PAGE */
+.success-page{text-align:center;padding:40px}
+.success-icon{width:80px;height:80px;margin:0 auto 20px;border-radius:50%;background:linear-gradient(135deg,var(--success),var(--accent));display:flex;align-items:center;justify-content:center}
+.success-icon svg{width:40px;height:40px;color:white}
+.success-page h2{font-size:1.8rem;font-weight:800;margin-bottom:10px;color:var(--dark)}
+.success-page p{color:var(--text-light);margin-bottom:8px}
+.order-number{display:inline-block;background:var(--bg);padding:8px 20px;border-radius:var(--radius-sm);font-weight:700;color:var(--primary);margin:16px 0 24px;font-size:1.1rem}
+
+/* FOOTER */
+.footer{background:var(--dark);color:white;padding:60px 0 20px}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
+.footer-brand p{color:rgba(255,255,255,.5);font-size:.9rem;margin-top:12px;line-height:1.7}
+.footer-col h4{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;color:rgba(255,255,255,.8)}
+.footer-col a{display:block;color:rgba(255,255,255,.5);font-size:.9rem;padding:4px 0;transition:var(--transition)}
+.footer-col a:hover{color:var(--accent)}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:20px;display:flex;justify-content:space-between;align-items:center;font-size:.85rem;color:rgba(255,255,255,.4)}
+.footer-social{display:flex;gap:16px}
+.footer-social a{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;transition:var(--transition)}
+.footer-social a:hover{background:var(--primary);transform:translateY(-2px)}
+.footer-social svg{width:16px;height:16px}
+
+/* LOADING */
+.loading-spinner{display:inline-block;width:20px;height:20px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TOAST */
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:5000;display:flex;flex-direction:column;gap:8px}
+.toast{padding:14px 24px;border-radius:var(--radius-sm);color:white;font-size:.9rem;font-weight:500;display:flex;align-items:center;gap:10px;animation:toastIn .3s ease;box-shadow:var(--shadow-lg);min-width:280px}
+.toast.success{background:var(--success)}
+.toast.error{background:var(--danger)}
+.toast.info{background:var(--primary)}
+@keyframes toastIn{from{opacity:0;transform:translateX(100px)}to{opacity:1;transform:translateX(0)}}
+.toast-close{margin-left:auto;background:none;border:none;color:white;cursor:pointer;font-size:1.1rem;opacity:.7}
+.toast-close:hover{opacity:1}
+
+/* SEARCH OVERLAY */
+.search-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:4000;display:none;align-items:flex-start;justify-content:center;padding-top:120px;backdrop-filter:blur(8px)}
+.search-overlay.active{display:flex}
+.search-box{width:100%;max-width:640px;background:var(--white);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-xl);animation:modalIn .3s ease}
+.search-input-wrapper{display:flex;align-items:center;padding:4px;border-bottom:1px solid var(--border)}
+.search-input-wrapper svg{width:24px;height:24px;margin:0 16px;color:var(--text-light);flex-shrink:0}
+.search-input-wrapper input{flex:1;padding:18px 0;border:none;font-size:1.1rem;background:transparent}
+.search-results{max-height:400px;overflow-y:auto;padding:8px}
+.search-result-item{display:flex;align-items:center;gap:16px;padding:12px 16px;border-radius:var(--radius-sm);cursor:pointer;transition:var(--transition)}
+.search-result-item:hover{background:var(--bg)}
+.search-result-item img{width:50px;height:50px;border-radius:8px;object-fit:cover}
+.search-result-info h4{font-size:.9rem;font-weight:600;color:var(--dark)}
+.search-result-info p{font-size:.8rem;color:var(--text-light)}
+.search-result-price{margin-left:auto;font-weight:700;color:var(--primary)}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+.products-grid{grid-template-columns:repeat(3,1fr)}
+.hero h1{font-size:2.8rem}
+.checkout-grid{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+.nav{display:none}
+.mobile-toggle{display:flex}
+.hero-inner{grid-template-columns:1fr}
+.hero-visual{display:none}
+.hero h1{font-size:2.2rem}
+.categories-grid{grid-template-columns:repeat(2,1fr)}
+.products-grid{grid-template-columns:repeat(2,1fr)}
+.why-grid{grid-template-columns:1fr}
+.process-steps{grid-template-columns:repeat(2,1fr)}
+.testimonials-grid{grid-template-columns:1fr}
+.footer-grid{grid-template-columns:repeat(2,1fr)}
+.modal-body{grid-template-columns:1fr}
+.modal-gallery{display:none}
+.cart-sidebar{width:100%}
+.hero-stats{gap:24px}
+.form-grid{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+.products-grid{grid-template-columns:1fr}
+.categories-grid{grid-template-columns:1fr}
+.hero-ctas{flex-direction:column}
+.newsletter-form{flex-direction:column}
+.hero h1{font-size:1.8rem}
+.section-header h2{font-size:1.8rem}
+.process-steps{grid-template-columns:1fr}
+}
+.shop-section{background:var(--bg)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header" id="header">
+<div class="header-inner">
+<a href="#" class="logo" onclick="showPage('home')">
+<div class="logo-icon">N</div>
+<span>NovaGadget</span>
+</a>
+<nav class="nav" id="mainNav">
+<a href="#" class="active" data-page="home" onclick="showPage('home')">Home</a>
+<a href="#" data-page="shop" onclick="showPage('shop')">Shop</a>
+<a href="#" data-page="about" onclick="showPage('about')">About</a>
+<a href="#" data-page="contact" onclick="showPage('contact')">Contact</a>
+</nav>
+<div class="header-actions">
+<button class="header-btn" onclick="toggleSearch()" aria-label="Search">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+</button>
+<button class="header-btn" onclick="toggleAuth()" aria-label="Account">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+</button>
+<button class="header-btn" onclick="toggleCart()" aria-label="Cart">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+<span class="cart-count" id="cartCount">0</span>
+</button>
+<button class="mobile-toggle" onclick="toggleMobileNav()" aria-label="Menu">
+<span></span><span></span><span></span>
+</button>
+</div>
+</div>
+</header>
+
+<!-- SEARCH OVERLAY -->
+<div class="search-overlay" id="searchOverlay" onclick="if(event.target===this)toggleSearch()">
+<div class="search-box">
+<div class="search-input-wrapper">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+<input type="text" id="searchInput" placeholder="Search gadgets, categories..." oninput="handleSearch(this.value)">
+</div>
+<div class="search-results" id="searchResults"></div>
+</div>
+</div>
+
+<!-- CART SIDEBAR -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-sidebar" id="cartSidebar">
+<div class="cart-header">
+<h3>Shopping Cart (<span id="cartItemCount">0</span>)</h3>
+<button class="modal-close" onclick="toggleCart()">&times;</button>
+</div>
+<div class="cart-items" id="cartItems">
+<div class="cart-empty" id="cartEmpty">
+<img data-tag="img" src="https://cdn-icons-png.flaticon.com/512/11329/11329060.png" alt="Empty cart">
+<h4>Your cart is empty</h4>
+<p style="color:var(--text-light);font-size:.9rem">Discover our curated gadgets!</p>
+</div>
+</div>
+<div class="cart-footer" id="cartFooter" style="display:none">
+<div class="cart-summary">
+<div class="cart-summary-row"><span>Subtotal</span><span id="cartSubtotal">$0.00</span></div>
+<div class="cart-summary-row"><span>Shipping</span><span id="cartShipping">Free</span></div>
+<div class="cart-summary-row"><span>Tax (8%)</span><span id="cartTax">$0.00</span></div>
+<div class="cart-summary-row total"><span>Total</span><span id="cartTotal">$0.00</span></div>
+</div>
+<button class="btn btn-primary btn-block btn-lg" onclick="goToCheckout()">Proceed to Checkout</button>
+</div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay auth-modal" id="authModal">
+<div class="modal">
+<button class="modal-close" onclick="toggleAuth()">&times;</button>
+<div class="modal-body">
+<h2 id="authTitle">Welcome Back</h2>
+<p class="subtitle" id="authSubtitle">Sign in to your NovaGadget account</p>
+<div class="auth-tabs">
+<button class="auth-tab active" onclick="switchAuthTab('login')">Sign In</button>
+<button class="auth-tab" onclick="switchAuthTab('register')">Register</button>
+</div>
+<div id="loginForm">
+<div class="form-group">
+<label>Email Address</label>
+<input type="email" id="loginEmail" placeholder="you@example.com">
+</div>
+<div class="form-group">
+<label>Password</label>
+<input type="password" id="loginPassword" placeholder="Enter your password">
+</div>
+<button class="btn btn-primary btn-block" onclick="handleLogin()" style="margin-bottom:12px">Sign In</button>
+<div class="divider">or continue with</div>
+<div class="social-btns">
+<button class="social-btn" onclick="showToast('Google sign-in requires OAuth setup','info')">
+<img data-tag="img" src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png" alt="Google" style="width:20px;height:20px"> Continue with Google
+</button>
+</div>
+</div>
+<div id="registerForm" style="display:none">
+<div class="form-group">
+<label>Full Name</label>
+<input type="text" id="regName" placeholder="Your full name">
+</div>
+<div class="form-group">
+<label>Email Address</label>
+<input type="email" id="regEmail" placeholder="you@example.com">
+</div>
+<div class="form-group">
+<label>Password</label>
+<input type="password" id="regPassword" placeholder="Create a password">
+</div>
+<button class="btn btn-primary btn-block" onclick="handleRegister()">Create Account</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- PRODUCT DETAIL MODAL -->
+<div class="modal-overlay" id="productModal">
+<div class="modal">
+<button class="modal-close" onclick="closeProductModal()">&times;</button>
+<div class="modal-body" id="productModalBody"></div>
+</div>
+</div>
+
+<!-- HOME PAGE -->
+<div class="page-content active" id="page-home">
+<!-- HERO -->
+<section class="hero">
+<div class="container">
+<div class="hero-inner">
+<div class="hero-content">
+<div class="hero-badge"><span class="dot"></span> Curated Tech Excellence</div>
+<h1>Tech That's <span class="highlight">Tested, Trusted</span> & Ready for You</h1>
+<p>Cut through the noise. Every gadget on NovaGadget is rigorously tested, expert-approved, and backed by real-world performance data. Only the best makes our shelf.</p>
+<div class="hero-ctas">
+<button class="btn btn-primary btn-lg" onclick="showPage('shop')">Shop Collection</button>
+<button class="btn btn-secondary btn-lg" onclick="showPage('about')">How We Test</button>
+</div>
+<div class="hero-stats">
+<div class="hero-stat"><div class="num">500+</div><div class="label">Products Tested</div></div>
+<div class="hero-stat"><div class="num">127</div><div class="label">Made The Cut</div></div>
+<div class="hero-stat"><div class="num">98%</div><div class="label">Happy Buyers</div></div>
+</div>
+</div>
+<div class="hero-visual">
+<div class="hero-img-wrapper">
+<img data-tag="img" src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&h=480&fit=crop" alt="Tech workspace with gadgets">
+</div>
+<div class="hero-float-card card1">
+<div class="float-card-inner">
+<div class="float-card-icon green">
+<img data-tag="img" src="https://cdn-icons-png.flaticon.com/512/845/845646.png" alt="Verified" style="width:22px;height:22px">
+</div>
+<div class="float-card-text">
+<h4>Nova Verified</h4>
+<p>Lab-tested quality</p>
+</div>
+</div>
+</div>
+<div class="hero-float-card card2">
+<div class="float-card-inner">
+<div class="float-card-icon purple">
+<img data-tag="img" src="https://cdn-icons-png.flaticon.com/512/3135/3135783.png" alt="Support" style="width:22px;height:22px">
+</div>
+<div class="float-card-text">
+<h4>Expert Support</h4>
+<p>24/7 tech guidance</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- TRUST BAR -->
+<section class="trust-bar">
+<div class="container">
+<div class="trust-bar-inner">
+<div class="trust-item">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+<span>30-Day Money Back</span>
+</div>
+<div class="trust-item">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="m16 8 5 3-5 3V8z"/></svg>
+<span>Expert Video Reviews</span>
+</div>
+<div class="trust-item">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
+<span>Curated Selection Only</span>
+</div>
+<div class="trust-item">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+<span>24/7 Tech Support</span>
+</div>
+<div class="trust-item">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+<span>Free Shipping $50+</span>
+</div>
+</div>
+</div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="section">
+<div class="container">
+<div class="section-header">
+<div class="tag">Browse</div>
+<h2>Shop By Category</h2>
+<p>From smart home essentials to portable power, find your perfect gadget</p>
+</div>
+<div class="categories-grid">
+<div class="category-card" onclick="filterByCategory('smart-home')">
+<div class="category-icon">
+<img data-tag="img" src="https://cdn-icons-png.flaticon.com/512/2983/2983068.png" alt="Smart Home">
+</div>
+<h3>Smart Home</h3>
+<p>Automate and elevate your living space</p>
+<span class="count">38 Products</span>
+</div>
+<div class="category-card" onclick="filterByCategory('portable-tech')">
+<div class="category-icon">
+<img data-tag="img" src="https://cdn-icons-png.flaticon.com/512/2933/2933116.png" alt="Portable Tech">
+</div>
+<h3>Portable Tech</h3>
+<p>Power and connectivity on the go</p>
+<span class="count">32 Products</span>
+</div>
+<div class="category-card" onclick="filterByCategory('productivity')">
+<div class="category-icon">
+<img data-tag="img" src="https://cdn-icons-png.flaticon.com/512/3135/3135768.png" alt="Productivity">
+</div>
+<h3>Productivity</h3>
+<p>Tools to optimize your workflow</p>
+<span class="count">28 Products</span>
+</div>
+<div class="category-card" onclick="filterByCategory('lifestyle')">
+<div class="category-icon">
+<img data-tag="img" src="https://cdn-icons-png.flaticon.com/512/3588/3588614.png" alt="Lifestyle">
+</div>
+<h3>Lifestyle</h3>
+<p>Tech that fits your everyday life</p>
+<span class="count">29 Products</span>
+</div>
+</div>
+</div>
+</section>
+
+<!-- FEATURED PRODUCTS -->
+<section class="section shop-section">
+<div class="container">
+<div class="section-header">
+<div class="tag">Featured</div>
+<h2>Nova Picks — Editor's Choice</h2>
+<p>Hand-selected gadgets that passed our rigorous 50-point quality test</p>
+</div>
+<div class="products-toolbar">
+<div class="filter-tabs">
+<button class="filter-tab active" onclick="filterProducts('all',this)">All</button>
+<button class="filter-tab" onclick="filterProducts('smart-home',this)">Smart Home</button>
+<button class="filter-tab" onclick="filterProducts('portable-tech',this)">Portable</button>
+<button class="filter-tab" onclick="filterProducts('productivity',this)">Productivity</button>
+<button class="filter-tab" onclick="filterProducts('lifestyle',this)">Lifestyle</button>
+</div>
+<select class="sort-select" onchange="sortProducts(this.value)">
+<option value="featured">Sort: Featured</option>
+<option value="price-low">Price: Low to High</option>
+<option value="price-high">Price: High to Low</option>
+<option value="rating">Highest Rated</option>
+<option value="newest">Newest</option>
+</select>
+</div>
+<div class="products-grid" id="productsGrid"></div>
+<div style="text-align:center;margin-top:40px">
+<button class="btn btn-outline btn-lg" onclick="showPage('shop')">View All Products</button>
+</div>
+</div>
+</section>
+
+<!-- WHY NOVAGADGET -->
+<section class="section">
+<div class="container">
+<div class="section-header">
+<div class="tag">Why Us</div>
+<h2>The NovaGadget Difference</h2>
+<p>We don't sell everything — we sell the right things</p>
+</div>
+<div class="why-grid">
+<div class="why-card">
+<div class="why-icon i1">
+<img data-tag="img" src="https://cdn-icons-png.flaticon.com/512/1087/1087815.png" alt="Testing" style="width:36px;height:36px">
+</div>
+<h3>Rigorous Testing</h3>
+<p>Every product undergoes a 50-point performance, durability, and safety evaluation before it earns the Nova Verified badge.</p>
+</div>
+<div class="why-card">
+<div class="why-icon i2">
+<img data-tag="img" src="https://cdn-icons-png.flaticon.com/512/3135/3135755.png" alt="Expert" style="width:36px;height:36px">
+</div>
+<h3>Expert Guidance</h3>
+<p>Our tech specialists provide personalized recommendations and post-purchase support to ensure you get the most from your gadget.</p>
+</div>
+<div class="why-card">
+<div class="why-icon i3">
+<img data-tag="img" src="https://cdn-icons-png.flaticon.com/512/2258/2258853.png" alt="Guarantee" style="width:36px;height:36px">
+</div>
+<h3>Zero-Risk Purchase</h3>
+<p>30-day money-back guarantee, extended warranties, and hassle-free returns. If it's not right, we make it right.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- TESTING PROCESS -->
+<section class="process-section">
+<div class="container">
+<div class="section-header">
+<div class="tag">Our Process</div>
+<h2>How Products Earn the Nova Badge</h2>
+<p>A transparent, data-driven approach to curation</p>
+</div>
+<div class="process-steps">
+<div class="process-step">
+<div class="step-num">1</div>
+<h3>Discovery</h3>
+<p>We scout 500+ products monthly from global manufacturers and emerging innovators.</p>
+</div>
+<div class="process-step">
+<div class="step-num">2</div>
+<h3>Lab Testing</h3>
+<p>50-point evaluation covering performance, build quality, safety, and real-world durability.</p>
+</div>
+<div class="process-step">
+<div class="step-num">3</div>
+<h3>Expert Review</h3>
+<p>Our panel of tech specialists puts each finalist through daily-use scenarios for 2+ weeks.</p>
+</div>
+<div class="process-step">
+<div class="step-num">4</div>
+<h3>Nova Certified</h3>
+<p>Only products scoring 85+ out of 100 earn the Nova Verified badge and make our shelf.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section">
+<div class="container">
+<div class="section-header">
+<div class="tag">Reviews</div>
+<h2>What Our Customers Say</h2>
+<p>Real feedback from real tech enthusiasts</p>
+</div>
+<div class="testimonials-grid">
+<div class="testimonial-card">
+<div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+<p class="testimonial-text">"Finally, a place that filters the junk! Every gadget I've bought from NovaGadget has exceeded my expectations. The testing reports sealed the deal for me."</p>
+<div class="testimonial-author">
+<img data-tag="img" class="testimonial-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face" alt="Alex R.">
+<div class="testimonial-info"><h4>Alex R.</h4><p>Verified Buyer — Smart Home</p></div>
+</div>
+</div>
+<div class="testimonial-card">
+<div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+<p class="testimonial-text">"The expert guidance saved me from buying the wrong wireless charger. Customer support knew exactly what I needed for my setup. Incredible service!"</p>
+<div class="testimonial-author">
+<img data-tag="img" class="testimonial-avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face" alt="Sarah M.">
+<div class="testimonial-info"><h4>Sarah M.</h4><p>Verified Buyer — Portable Tech</p></div>
+</div>
+</div>
+<div class="testimonial-card">
+<div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+<p class="testimonial-text">"I was skeptical about curated retail, but the NovaScore on every product backed by real test data won me over. My mechanical keyboard is phenomenal."</p>
+<div class="testimonial-author">
+<img data-tag="img" class="testimonial-avatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face" alt="James T.">
+<div class="testimonial-info"><h4>James T.</h4><p>Verified Buyer — Productivity</p></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="newsletter">
+<div class="container">
+<h2>Get First Access to New Arrivals</h2>
+<p>Join 12,000+ tech enthusiasts. Get curated picks, exclusive deals, and testing insights weekly.</p>
+<form class="newsletter-form" onsubmit="handleNewsletter(event)">
+<input type="email" placeholder="Enter your email address" required>
+<button type="submit">Subscribe</button>
+</form>
+</div>
+</section>
+</div>
+
+<!-- SHOP PAGE -->
+<div class="page-content" id="page-shop">
+<section class="section shop-section" style="padding-top:100px;min-height:100vh">
+<div class="container">
+<div class="section-header">
+<div class="tag">Collection</div>
+<h2>All Curated Gadgets</h2>
+<p>Every product has been tested and verified by our expert panel</p>
+</div>
+<div class="products-toolbar">
+<div class="filter-tabs" id="shopFilterTabs">
+<button class="filter-tab active" onclick="filterProducts('all',this,'shopGrid')">All</button>
+<button class="filter-tab" onclick="filterProducts('smart-home',this,'shopGrid')">Smart Home</button>
+<button class="filter-tab" onclick="filterProducts('portable-tech',this,'shopGrid')">Portable</button>
+<button class="filter-tab" onclick="filterProducts('productivity',this,'shopGrid')">Productivity</button>
+<button class="filter-tab" onclick="filterProducts('lifestyle',this,'shopGrid')">Lifestyle</button>
+</div>
+<select class="sort-select" onchange="sortProducts(this.value,'shopGrid')">
+<option value="featured">Sort: Featured</option>
+<option value="price-low">Price: Low to High</option>
+<option value="price-high">Price: High to Low</option>
+<option value="rating">Highest Rated</option>
+</select>
+</div>
+<div class="products-grid" id="shopGrid"></div>
+</div>
+</section>
+</div>
+
+<!-- ABOUT PAGE -->
+<div class="page-content" id="page-about">
+<section class="section" style="padding-top:100px">
+<div class="container">
+<div class="section-header">
+<div class="tag">Our Story</div>
+<h2>Built for Gadget Lovers Who Demand Better</h2>
+<p>We started NovaGadget because we were tired of buying tech that disappointed</p>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-bottom:60px">
+<div>
+<img data-tag="img" src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=400&fit=crop" alt="NovaGadget team" style="border-radius:var(--radius-lg);width:100%;height:360px;object-fit:cover">
+</div>
+<div>
+<h3 style="font-size:1.5rem;font-weight:700;margin-bottom:16px;color:var(--dark)">We Test What Others Won't</h3>
+<p style="color:var(--text-light);line-height:1.8;margin-bottom:16px">In a market flooded with millions of gadgets, finding the genuinely good ones feels impossible. Fake reviews, misleading specs, and race-to-the-bottom pricing have eroded consumer trust.</p>
+<p style="color:var(--text-light);line-height:1.8;margin-bottom:16px">NovaGadget was founded to be the antidote. Our team of engineers, designers, and tech enthusiasts personally tests every product with a rigorous 50-point evaluation before it ever reaches our shelves.</p>
+<p style="color:var(--text-light);line-height:1.8">We reject over 74% of products we evaluate. What remains is a carefully curated collection of gadgets you can trust — backed by real data, honest reviews, and expert support.</p>
+</div>
+</div>
+</div>
+</section>
+<section class="process-section">
+<div class="container">
+<div class="section-header">
+<div class="tag">Our Process</div>
+<h2>How Products Earn the Nova Badge</h2>
+<p>A transparent, data-driven approach to curation</p>
+</div>
+<div class="process-steps">
+<div class="process-step"><div class="step-num">1</div><h3>Discovery</h3><p>We scout 500+ products monthly from global manufacturers.</p></div>
+<div class="process-step"><div class="step-num">2</div><h3>Lab Testing</h3><p>50-point evaluation covering performance, build quality, and safety.</p></div>
+<div class="process-step"><div class="step-num">3</div><h3>Expert Review</h3><p>Two-week real-world testing by our specialist panel.</p></div>
+<div class="process-step"><div class="step-num">4</div><h3>Nova Certified</h3><p>Only 85+ scoring products make our collection.</p></div>
+</div>
+</div>
+</section>
+</div>
+
+<!-- CONTACT PAGE -->
+<div class="page-content" id="page-contact">
+<section class="section" style="padding-top:100px">
+<div class="container" style="max-width:720px">
+<div class="section-header">
+<div class="tag">Contact</div>
+<h2>Get In Touch</h2>
+<p>Our expert team is here to help with product questions, orders, or partnerships</p>
+</div>
+<div class="checkout-section">
+<div class="form-grid">
+<div class="form-group"><label>First Name</label><input type="text" placeholder="John"></div>
+<div class="form-group"><label>Last Name</label><input type="text" placeholder="Doe"></div>
+<div class="form-group full"><label>Email</label><input type="email" placeholder="you@example.com"></div>
+<div class="form-group full"><label>Subject</label>
+<select><option>Product Question</option><option>Order Support</option><option>Partnership</option><option>General Inquiry</option></select>
+</div>
+<div class="form-group full"><label>Message</label><textarea style="width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.9rem;resize:vertical;min-height:120px;font-family:inherit" placeholder="Tell us how we can help..."></textarea></div>
+</div>
+<button class="btn btn-primary btn-block" onclick="showToast('Message sent! We\'ll get back to you within 24 hours.','success')">Send Message</button>
+</div>
+</div>
+</section>
+</div>
+
+<!-- CHECKOUT PAGE -->
+<div class="page-content" id="page-checkout">
+<section class="section" style="padding-top:100px">
+<div class="container">
+<h2 style="font-size:2rem;font-weight:800;margin-bottom:32px;color:var(--dark)">Checkout</h2>
+<div class="checkout-grid">
+<div>
+<!-- Contact Info -->
+<div class="checkout-section">
+<h3><span class="step-badge">1</span> Contact Information</h3>
+<div class="form-grid">
+<div class="form-group"><label>First Name</label><input type="text" id="checkFirstName" placeholder="John"></div>
+<div class="form-group"><label>Last Name</label><input type="text" id="checkLastName" placeholder="Doe"></div>
+<div class="form-group full"><label>Email</label><input type="email" id="checkEmail" placeholder="you@example.com"></div>
+<div class="form-group full"><label>Phone</label><input type="tel" id="checkPhone" placeholder="+1 (555) 000-0000"></div>
+</div>
+</div>
+
+<!-- Shipping -->
+<div class="checkout-section">
+<h3><span class="step-badge">2</span> Shipping Address</h3>
+<div class="form-grid">
+<div class="form-group full"><label>Address</label><input type="text" id="checkAddress" placeholder="123 Tech Street"></div>
+<div class="form-group full"><label>Apartment, suite, etc.</label><input type="text" id="checkApt" placeholder="Apt 4B"></div>
+<div class="form-group"><label>City</label><input type="text" id="checkCity" placeholder="San Francisco"></div>
+<div class="form-group"><label>State</label><input type="text" id="checkState" placeholder="California"></div>
+<div class="form-group"><label>ZIP Code</label><input type="text" id="checkZip" placeholder="94102"></div>
+<div class="form-group"><label>Country</label>
+<select id="checkCountry"><option>United States</option><option>Canada</option><option>United Kingdom</option><option>Australia</option><option>Germany</option></select>
+</div>
+</div>
+</div>
+
+<!-- Payment -->
+<div class="checkout-section">
+<h3><span class="step-badge">3</span> Payment Method</h3>
+<div class="payment-methods">
+<label class="payment-method selected" onclick="selectPayment('stripe',this)">
+<input type="radio" name="payment" value="stripe" checked>
+<div class="payment-method-info">
+<h4>Credit / Debit Card</h4>
+<p>Secure payment via Stripe</p>
+</div>
+<img data-tag="img" src="https://cdn-icons-png.flaticon.com/512/5968/5968382.png" alt="Stripe" style="height:28px;width:auto">
+</label>
+<label class="payment-method" onclick="selectPayment('paypal',this)">
+<input type="radio" name="payment" value="paypal">
+<div class="payment-method-info">
+<h4>PayPal</h4>
+<p>Pay with your PayPal account</p>
+</div>
+<img data-tag="img" src="https://cdn-icons-png.flaticon.com/512/174/174861.png" alt="PayPal" style="height:28px;width:auto">
+</label>
+<label class="payment-method" onclick="selectPayment('square',this)">
+<input type="radio" name="payment" value="square">
+<div class="payment-method-info">
+<h4>Square</h4>
+<p>Pay with Square checkout</p>
+</div>
+<img data-tag="img" src="https://cdn-icons-png.flaticon.com/512/5968/5968523.png" alt="Square" style="height:28px;width:auto">
+</label>
+</div>
+
+<!-- Stripe Payment Form -->
+<div class="gateway-config" id="stripeConfig">
+<h4>Card Details (Stripe)</h4>
+<div class="form-group">
+<label>Card Number</label>
+<input type="text" id="cardNumber" placeholder="4242 4242 4242 4242" maxlength="19" oninput="formatCardNumber(this)">
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div class="form-group">
+<label>Expiry</label>
+<input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)">
+</div>
+<div class="form-group">
+<label>CVC</label>
+<input type="text" id="cardCVC" placeholder="123" maxlength="4">
+</div>
+</div>
+<div class="form-group">
+<label>Cardholder Name</label>
+<input type="text" id="cardName" placeholder="John Doe">
+</div>
+<div class="note">
+<strong>Stripe Integration:</strong> Connect your Stripe API keys below to process real payments. In test mode, use card 4242 4242 4242 4242.
+<div style="margin-top:8px">
+<div class="form-group" style="margin-bottom:8px">
+<label style="font-size:.75rem">Stripe Publishable Key</label>
+<input type="text" id="stripePublicKey" placeholder="pk_test_..." style="font-size:.8rem;padding:8px 12px">
+</div>
+<div class="form-group" style="margin-bottom:0">
+<label style="font-size:.75rem">Stripe Secret Key</label>
+<input type="password" id="stripeSecretKey" placeholder="sk_test_..." style="font-size:.8rem;padding:8px 12px">
+</div>
+</div>
+</div>
+</div>
+
+<!-- PayPal Config -->
+<div class="gateway-config" id="paypalConfig" style="display:none">
+<h4>PayPal Checkout</h4>
+<p style="font-size:.85rem;color:var(--text-light);margin-bottom:12px">You will be redirected to PayPal to complete your payment securely.</p>
+<div class="note">
+<strong>PayPal Integration:</strong> Enter your PayPal Client ID below to enable live payments.
+<div style="margin-top:8px">
+<div class="form-group" style="margin-bottom:8px">
+<label style="font-size:.75rem">PayPal Client ID</label>
+<input type="text" id="paypalClientId" placeholder="AZ3n8..." style="font-size:.8rem;padding:8px 12px">
+</div>
+<div class="form-group" style="margin-bottom:0">
+<label style="font-size:.75rem">PayPal Secret</label>
+<input type="password" id="paypalSecret" placeholder="EK..." style="font-size:.8rem;padding:8px 12px">
+</div>
+</div>
+</div>
+<div id="paypal-button-container" style="margin-top:16px;min-height:48px;background:var(--bg);border-radius:8px;display:flex;align-items:center;justify-content:center;padding:16px;border:2px dashed var(--border)">
+<span style="font-size:.85rem;color:var(--text-light)">PayPal button renders here with valid Client ID</span>
+</div>
+</div>
+
+<!-- Square Config -->
+<div class="gateway-config" id="squareConfig" style="display:none">
+<h4>Square Payment</h4>
+<p style="font-size:.85rem;color:var(--text-light);margin-bottom:12px">Secure payment processed by Square.</p>
+<div class="form-group">
+<label>Card Number</label>
+<input type="text" id="sqCardNumber" placeholder="4532 1234 5678 9012" maxlength="19" oninput="formatCardNumber(this)">
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div class="form-group">
+<label>Expiry</label>
+<input type="text" id="sqCardExpiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)">
+</div>
+<div class="form-group">
+<label>CVV</label>
+<input type="text" id="sqCardCVV" placeholder="123" maxlength="4">
+</div>
+</div>
+<div class="note">
+<strong>Square Integration:</strong> Enter your Square API credentials below.
+<div style="margin-top:8px">
+<div class="form-group" style="margin-bottom:8px">
+<label style="font-size:.75rem">Square Application ID</label>
+<input type="text" id="squareAppId" placeholder="sandbox-sq0idb-..." style="font-size:.8rem;padding:8px 12px">
+</div>
+<div class="form-group" style="margin-bottom:8px">
+<label style="font-size:.75rem">Square Access Token</label>
+<input type="password" id="squareAccessToken" placeholder="EAAAl..." style="font-size:.8rem;padding:8px 12px">
+</div>
+<div class="form-group" style="margin-bottom:0">
+<label style="font-size:.75rem">Square Location ID</label>
+<input type="text" id="squareLocationId" placeholder="L..." style="font-size:.8rem;padding:8px 12px">
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="checkout-section">
+<button class="btn btn-primary btn-block btn-lg" id="placeOrderBtn" onclick="placeOrder()">
+Place Order — <span id="checkoutTotalBtn">$0.00</span>
+</button>
+<p style="text-align:center;font-size:.8rem;color:var(--text-light);margin-top:12px">
+<svg style="width:14px;height:14px;vertical-align:middle;margin-right:4px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+Your payment information is encrypted and secure
+</p>
+</div>
+</div>
+
+<!-- Order Summary Sidebar -->
+<div class="order-summary">
+<div class="checkout-section">
+<h3>Order Summary</h3>
+<div id="checkoutItems"></div>
+<div class="promo-code">
+<input type="text" placeholder="Promo code" id="promoInput">
+<button class="btn btn-sm btn-outline" onclick="applyPromo()">Apply</button>
+</div>
+<div class="cart-summary" style="margin-top:16px">
+<div class="cart-summary-row"><span>Subtotal</span><span id="checkSubtotal">$0.00</span></div>
+<div class="cart-summary-row"><span>Shipping</span><span id="checkShipping">Free</span></div>
+<div class="cart-summary-row" id="discountRow" style="display:none;color:var(--success)"><span>Discount</span><span id="checkDiscount">-$0.00</span></div>
+<div class="cart-summary-row"><span>Tax (8%)</span><span id="checkTax">$0.00</span></div>
+<div class="cart-summary-row total"><span>Total</span><span id="checkTotal">$0.00</span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+
+<!-- ORDER SUCCESS PAGE -->
+<div class="page-content" id="page-success">
+<section class="section" style="padding-top:100px">
+<div class="container" style="max-width:600px">
+<div class="checkout-section">
+<div class="success-page">
+<div class="success-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+</div>
+<h2>Order Confirmed!</h2>
+<p>Thank you for your purchase. We've sent a confirmation to your email.</p>
+<div class="order-number" id="orderNumber">NG-000000</div>
+<p style="font-size:.9rem">Your curated gadgets are being prepared with care.</p>
+<div style="margin-top:32px;display:flex;gap:12px;justify-content:center">
+<button class="btn btn-primary" onclick="continueShopping()">Continue Shopping</button>
+<button class="btn btn-outline" onclick="showPage('home')">Back to Home</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</section>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+<div class="container">
+<div class="footer-grid">
+<div class="footer-brand">
+<div class="logo" style="margin-bottom:4px">
+<div class="logo-icon">N</div>
+<span>NovaGadget</span>
+</div>
+<p>Curated tech you can trust. Every product is rigorously tested, expert-approved, and backed by exceptional support.</p>
+</div>
+<div class="footer-col">
+<h4>Shop</h4>
+<a href="#" onclick="filterByCategory('smart-home')">Smart Home</a>
+<a href="#" onclick="filterByCategory('portable-tech')">Portable Tech</a>
+<a href="#" onclick="filterByCategory('productivity')">Productivity</a>
+<a href="#" onclick="filterByCategory('lifestyle')">Lifestyle</a>
+</div>
+<div class="footer-col">
+<h4>Company</h4>
+<a href="#" onclick="showPage('about')">About Us</a>
+<a href="#" onclick="showPage('about')">How We Test</a>
+<a href="#" onclick="showPage('contact')">Contact</a>
+<a href="#">Careers</a>
+</div>
+<div class="footer-col">
+<h4>Support</h4>
+<a href="#">Help Center</a>
+<a href="#">Shipping Info</a>
+<a href="#">Returns</a>
+<a href="#">Warranty</a>
+</div>
+</div>
+<div class="footer-bottom">
+<span>&copy; 2025 NovaGadget. All rights reserved.</span>
+<div class="footer-social">
+<a href="#" aria-label="Twitter"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+<a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg></a>
+<a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31.4 31.4 0 000 12a31.4 31.4 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1c.4-1.8.5-5.8.5-5.8s0-4-.5-5.8zM9.5 15.6V8.4L16 12l-6.5 3.6z"/></svg></a>
+</div>
+</div>
+</div>
+</footer>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ==================== DATA ====================
+const products = [
+  {
+    id:1, name:"NovaSphere Smart Speaker", category:"smart-home", price:129.99, originalPrice:159.99,
+    image:"https://images.unsplash.com/photo-1543512214-318c7553f230?w=400&h=280&fit=crop",
+    rating:4.8, reviews:234, novaScore:94, badges:["tested","popular"],
+    description:"Premium 360° room-filling sound with built-in voice assistant. Seamless multi-room audio and smart home hub integration.",
+    specs:["360° Omnidirectional Audio","Voice Assistant Built-in","Multi-Room Sync","Wi-Fi 6 + Bluetooth 5.3","Recycled Aluminum Shell"]
+  },
+  {
+    id:2, name:"AeroCharge 65W GaN Charger", category:"portable-tech", price:49.99, originalPrice:69.99,
+    image:"https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=400&h=280&fit=crop",
+    rating:4.9, reviews:189, novaScore:97, badges:["tested","new"],
+    description:"Ultra-compact GaN charger with 3 ports delivering 65W total. Charges a MacBook Pro to 50% in 30 minutes.",
+    specs:["65W USB-C PD 3.0","GaN III Technology","3 Ports (2C + 1A)","Foldable Prongs","Universal 100-240V"]
+  },
+  {
+    id:3, name:"KeyFlow Mechanical Keyboard", category:"productivity", price:159.99, originalPrice:null,
+    image:"https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=400&h=280&fit=crop",
+    rating:4.7, reviews:156, novaScore:92, badges:["tested"],
+    description:"Hot-swappable low-profile mechanical keyboard with per-key RGB. Gasket-mounted for a premium typing experience.",
+    specs:["Hot-Swappable Switches","Gasket Mount Design","Per-Key RGB Lighting","USB-C & Bluetooth 5.2","Aircraft-Grade Aluminum"]
+  },
+  {
+    id:4, name:"LunaTrack Smart Watch", category:"lifestyle", price:249.99, originalPrice:299.99,
+    image:"https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=400&h=280&fit=crop",
+    rating:4.6, reviews:312, novaScore:91, badges:["tested","popular"],
+    description:"Advanced health monitoring with ECG, SpO2, and sleep tracking. 7-day battery life with always-on AMOLED display.",
+    specs:["1.4\" AMOLED Always-On","ECG + SpO2 Monitoring","7-Day Battery Life","5ATM Water Resistant","100+ Sport Modes"]
+  },
+  {
+    id:5, name:"NovaLens Security Camera", category:"smart-home", price:89.99, originalPrice:119.99,
+    image:"https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&h=280&fit=crop",
+    rating:4.5, reviews:278, novaScore:89, badges:["tested"],
+    description:"2K HDR security camera with AI person detection, two-way audio, and local storage option for complete privacy.",
+    specs:["2K QHD Resolution","AI Person Detection","Two-Way Audio","Local + Cloud Storage","Night Vision 30ft"]
+  },
+  {
+    id:6, name:"PowerVault 20000mAh Bank", category:"portable-tech", price:59.99, originalPrice:null,
+    image:"https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400&h=280&fit=crop",
+    rating:4.8, reviews:423, novaScore:95, badges:["tested","popular"],
+    description:"20000mAh portable power bank with 100W PD output. Charges a laptop, phone, and tablet simultaneously.",
+    specs:["20000mAh Capacity","100W PD Output","Digital Display","Pass-Through Charging","Aviation-Grade Battery"]
+  },
+  {
+    id:7, name:"FocusDesk LED Monitor Light", category:"productivity", price:69.99, originalPrice:89.99,
+    image:"https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=400&h=280&fit=crop",
+    rating:4.7, reviews:167, novaScore:90, badges:["tested","new"],
+    description:"Asymmetric LED monitor light bar with auto-dimming sensor. Zero screen glare design for reduced eye strain.",
+    specs:["Asymmetric Light Design","Auto-Brightness Sensor","Adjustable Color Temp","Zero Screen Glare","USB-C Powered"]
+  },
+  {
+    id:8, name:"ZenBud ANC Earbuds", category:"lifestyle", price:119.99, originalPrice:149.99,
+    image:"https://images.unsplash.com/photo-1590658268037-6bf12f032f55?w=400&h=280&fit=crop",
+    rating:4.6, reviews:289, novaScore:93, badges:["tested"],
+    description:"Adaptive noise cancellation earbuds with spatial audio and 32-hour total battery life. Crystal-clear call quality.",
+    specs:["Adaptive ANC","Spatial Audio","32hr Total Battery","IPX5 Water Resistant","6 Microphone Array"]
+  },
+  {
+    id:9, name:"ClimaSync Smart Thermostat", category:"smart-home", price:179.99, originalPrice:219.99,
+    image:"https://images.unsplash.com/photo-1558002038-1055907df827?w=400&h=280&fit=crop",
+    rating:4.8, reviews:198, novaScore:96, badges:["tested","new"],
+    description:"AI-powered thermostat that learns your schedule and preferences. Saves up to 26% on energy bills with room-by-room control.",
+    specs:["AI Learning Algorithm","Room-by-Room Zones","Energy Reports","Works with All Assistants","Touchscreen + App Control"]
+  },
+  {
+    id:10, name:"SwiftDock USB-C Hub 12-in-1", category:"productivity", price:79.99, originalPrice:99.99,
+    image:"https://images.unsplash.com/photo-1625842268584-8f3296236761?w=400&h=280&fit=crop",
+    rating:4.5, reviews:145, novaScore:88, badges:["tested"],
+    description:"12-port USB-C hub with dual HDMI 4K@60Hz, ethernet, SD slots, and 100W PD pass-through. One cable, full desk setup.",
+    specs:["Dual HDMI 4K@60Hz","Gigabit Ethernet","100W PD Pass-Through","SD + MicroSD Slots","Aluminum Heat Sink"]
+  },
+  {
+    id:11, name:"AquaPure Smart Water Bottle", category:"lifestyle", price:44.99, originalPrice:null,
+    image:"https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&h=280&fit=crop",
+    rating:4.4, reviews:201, novaScore:86, badges:["tested"],
+    description:"UV-C self-cleaning water bottle with hydration tracking. Purifies water in 60 seconds and reminds you to stay hydrated.",
+    specs:["UV-C Sterilization","Hydration Tracking","LED Temperature Display","24hr Cold / 12hr Hot","Medical-Grade Steel"]
+  },
+  {
+    id:12, name:"NovaBulb RGBW Smart Light Kit", category:"smart-home", price:39.99, originalPrice:54.99,
+    image:"https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?w=400&h=280&fit=crop",
+    rating:4.3, reviews:334, novaScore:85, badges:["tested","sale"],
+    description:"4-pack RGBW smart bulbs with 16 million colors and music sync. Voice control compatible, no hub required.",
+    specs:["16M Colors + Warm White","Music Sync Mode","Voice Control Ready","No Hub Required","800 Lumens per Bulb"]
+  }
+];
+
+// ==================== STATE ====================
+let cart = JSON.parse(localStorage.getItem('novaCart')) || [];
+let currentUser = JSON.parse(localStorage.getItem('novaUser')) || null;
+let selectedPayment = 'stripe';
+let promoApplied = false;
+let promoDiscount = 0;
+
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded', () => {
+  renderProducts('productsGrid', products.slice(0, 8));
+  renderProducts('shopGrid', products);
+  updateCartUI();
+  
+  window.addEventListener('scroll', () => {
+    document.getElementById('header').classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeProductModal();
+      document.getElementById('searchOverlay').classList.remove('active');
+      document.getElementById('authModal').classList.remove('active');
+    }
+  });
+});
+
+// ==================== PAGES ====================
+function showPage(page) {
+  document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav a').forEach(a => {
+    a.classList.toggle('active', a.dataset.page === page);
+  });
+  window.scrollTo({top: 0, behavior: 'smooth'});
+  
+  if (page === 'shop') {
+    renderProducts('shopGrid', products);
+  }
+}
+
+// ==================== PRODUCTS RENDERING ====================
+function renderProducts(gridId, items) {
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+  grid.innerHTML = items.map(p => `
+    <div class="product-card" data-category="${p.category}" data-price="${p.price}" data-rating="${p.rating}" data-id="${p.id}">
+      <div class="product-badges">
+        ${p.badges.includes('tested') ? '<span class="product-badge badge-tested">Nova Verified</span>' : ''}
+        ${p.badges.includes('new') ? '<span class="product-badge badge-new">New</span>' : ''}
+        ${p.badges.includes('popular') ? '<span class="product-badge badge-popular">Best Seller</span>' : ''}
+        ${p.badges.includes('sale') ? '<span class="product-badge badge-sale">Sale</span>' : ''}
+      </div>
+      <button class="product-wishlist" onclick="event.stopPropagation();toggleWishlist(this)" aria-label="Add to wishlist">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+      <div class="product-img-wrapper" onclick="openProductModal(${p.id})" style="cursor:pointer">
+        <img data-tag="img" class="product-img" src="${p.image}" alt="${p.name}" loading="lazy">
+        <div class="product-quick-add">
+          <button class="btn btn-sm btn-accent" onclick="event.stopPropagation();addToCart(${p.id})">Add to Cart</button>
+        </div>
+      </div>
+      <div class="product-info" onclick="openProductModal(${p.id})" style="cursor:pointer">
+        <div class="product-category">${p.category.replace('-', ' ')}</div>
+        <h3 class="product-name">${p.name}</h3>
+        <div class="product-rating">
+          <div class="stars">${renderStars(p.rating)}</div>
+          <span class="rating-count">(${p.reviews})</span>
+        </div>
+        <div class="product-price">
+          <span class="price-current">$${p.price.toFixed(2)}</span>
+          ${p.originalPrice ? `<span class="price-original">$${p.originalPrice.toFixed(2)}</span><span class="price-discount">-${Math.round((1-p.price/p.originalPrice)*100)}%</span>` : ''}
+        </div>
+      </div>
+      <div class="product-footer">
+        <div class="nova-score">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2 12l10 5 10-5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          Nova Score: ${p.novaScore}/100
+        </div>
+        <button class="btn btn-sm btn-primary" onclick="addToCart(${p.id})">Add</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderStars(rating) {
+  let s = '';
+  for (let i = 1; i <= 5; i++) {
+    s += `<span class="star${i > Math.round(rating) ? ' empty' : ''}">&#9733;</span>`;
+  }
+  return s;
+}
+
+// ==================== FILTERING & SORTING ====================
+function filterProducts(category, btn, gridId = 'productsGrid') {
+  const parent = btn.parentElement;
+  parent.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  
+  const filtered = category === 'all' ? products : products.filter(p => p.category === category);
+  const items = gridId === 'productsGrid' ? filtered.slice(0, 8) : filtered;
+  renderProducts(gridId, items);
+}
+
+function filterByCategory(category) {
+  showPage('shop');
+  setTimeout(() => {
+    const tabs = document.querySelectorAll('#shopFilterTabs .filter-tab');
+    tabs.forEach(t => {
+      t.classList.remove('active');
+      if (t.textContent.toLowerCase().replace(' ', '-') === category || 
+          (category === 'portable-tech' && t.textContent === 'Portable')) {
+        t.classList.add('active');
+      }
+    });
+    const filtered = products.filter(p => p.category === category);
+    renderProducts('shopGrid', filtered);
+  }, 100);
+}
+
+function sortProducts(value, gridId = 'productsGrid') {
+  const grid = document.getElementById(gridId);
+  const cards = [...grid.children];
+  const activeFilter = grid.parentElement.querySelector('.filter-tab.active');
+  const cat = activeFilter ? activeFilter.textContent.toLowerCase().replace(' ', '-') : 'all';
+  
+  let filtered = cat === 'all' ? [...products] : products.filter(p => p.category === cat);
+  
+  switch(value) {
+    case 'price-low': filtered.sort((a,b) => a.price - b.price); break;
+    case 'price-high': filtered.sort((a,b) => b.price - a.price); break;
+    case 'rating': filtered.sort((a,b) => b.rating - a.rating); break;
+    case 'newest': filtered.sort((a,b) => b.id - a.id); break;
+  }
+  
+  renderProducts(gridId, gridId === 'productsGrid' ? filtered.slice(0,8) : filtered);
+}
+
+// ==================== PRODUCT MODAL ====================
+function openProductModal(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  
+  const modal = document.getElementById('productModal');
+  document.getElementById('productModalBody').innerHTML = `
+    <div class="modal-gallery">
+      <img data-tag="img" src="${p.image}" alt="${p.name}" style="width:100%;height:380px;object-fit:cover;border-radius:var(--radius)">
+    </div>
+    <div class="modal-details">
+      <div class="product-category">${p.category.replace('-', ' ')}</div>
+      <h2>${p.name}</h2>
+      <div class="product-rating">
+        <div class="stars">${renderStars(p.rating)}</div>
+        <span class="rating-count">${p.rating} (${p.reviews} reviews)</span>
+      </div>
+      <div class="nova-score-detail">
+        <div class="score-circle">${p.novaScore}</div>
+        <div class="score-text">
+          <h4>Nova Score ${p.novaScore}/100</h4>
+          <p>Based on 50-point lab evaluation + expert review</p>
+        </div>
+      </div>
+      <p class="description">${p.description}</p>
+      <div class="price-section">
+        <div class="product-price">
+          <span class="price-current">$${p.price.toFixed(2)}</span>
+          ${p.originalPrice ? `<span class="price-original">$${p.originalPrice.toFixed(2)}</span><span class="price-discount">Save $${(p.originalPrice - p.price).toFixed(2)}</span>` : ''}
+        </div>
+      </div>
+      <ul class="specs-list">
+        ${p.specs.map(s => `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>${s}</li>`).join('')}
+      </ul>
+      <div class="quantity-selector">
+        <label>Quantity:</label>
+        <div class="qty-controls">
+          <button class="qty-btn" onclick="changeModalQty(-1)">−</button>
+          <input class="qty-value" type="text" value="1" id="modalQty" readonly>
+          <button class="qty-btn" onclick="changeModalQty(1)">+</button>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary btn-lg" style="flex:1" onclick="addToCartFromModal(${p.id})">Add to Cart</button>
+        <button class="btn btn-outline btn-lg" onclick="addToCartFromModal(${p.id});goToCheckout()">Buy Now</button>
+      </div>
+    </div>
+  `;
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeProductModal() {
+  document.getElementById('productModal').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function changeModalQty(delta) {
+  const input = document.getElementById('modalQty');
+  let val = parseInt(input.value) + delta;
+  if (val < 1) val = 1;
+  if (val > 10) val = 10;
+  input.value = val;
+}
+
+// ==================== CART ====================
+function addToCart(id) {
+  const product = products.find(p => p.id === id);
+  if (!product) return;
+  
+  const existing = cart.find(item => item.id === id);
+  if (existing) {
+    existing.qty++;
+  } else {
+    cart.push({ id: product.id, name: product.name, price: product.price, image: product.image, qty: 1 });
+  }
+  
+  saveCart();
+  updateCartUI();
+  showToast(`${product.name} added to cart!`, 'success');
+}
+
+function addToCartFromModal(id) {
+  const qty = parseInt(document.getElementById('modalQty')?.value || 1);
+  const product = products.find(p => p.id === id);
+  if (!product) return;
+  
+  const existing = cart.find(item => item.id === id);
+  if (existing) {
+    existing.qty += qty;
+  } else {
+    cart.push({ id: product.id, name: product.name, price: product.price, image: product.image, qty });
+  }
+  
+  saveCart();
+  updateCartUI();
+  closeProductModal();
+  showToast(`${product.name} (x${qty}) added to cart!`, 'success');
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(item => item.id !== id);
+  saveCart();
+  updateCartUI();
+}
+
+function updateCartQty(id, delta) {
+  const item = cart.find(i => i.id === id);
+  if (!item) return;
+  item.qty += delta;
+  if (item.qty <= 0) {
+    removeFromCart(id);
+    return;
+  }
+  saveCart();
+  updateCartUI();
+}
+
+function saveCart() {
+  localStorage.setItem('novaCart', JSON.stringify(cart));
+}
+
+function updateCartUI() {
+  const count = cart.reduce((sum, item) => sum + item.qty, 0);
+  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  const tax = subtotal * 0.08;
+  const shipping = subtotal >= 50 ? 0 : 9.99;
+  const total = subtotal + tax + shipping;
+  
+  document.getElementById('cartCount').textContent = count;
+  document.getElementById('cartItemCount').textContent = count;
+  
+  const cartItemsEl = document.getElementById('cartItems');
+  const cartEmpty = document.getElementById('cartEmpty');
+  const cartFooter = document.getElementById('cartFooter');
+  
+  if (cart.length === 0) {
+    cartEmpty.style.display = 'block';
+    cartFooter.style.display = 'none';
+    cartItemsEl.innerHTML = cartEmpty.outerHTML;
+  } else {
+    cartFooter.style.display = 'block';
+    cartItemsEl.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <img data-tag="img" class="cart-item-img" src="${item.image}" alt="${item.name}">
+        <div class="cart-item-info">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+          <div class="cart-item-qty">
+            <button onclick="updateCartQty(${item.id},-1)">−</button>
+            <span>${item.qty}</span>
+            <button onclick="updateCartQty(${item.id},1)">+</button>
+          </div>
+        </div>
+        <button class="cart-item-remove" onclick="removeFromCart(${item.id})" aria-label="Remove">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+        </button>
+      </div>
+    `).join('');
+  }
+  
+  document.getElementById('cartSubtotal').textContent = `$${subtotal.toFixed(2)}`;
+  document.getElementById('cartShipping').textContent = shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`;
+  document.getElementById('cartTax').textContent = `$${tax.toFixed(2)}`;
+  document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
+}
+
+function toggleCart() {
+  const overlay = document.getElementById('cartOverlay');
+  const sidebar = document.getElementById('cartSidebar');
+  const isActive = sidebar.classList.contains('active');
+  
+  if (isActive) {
+    overlay.classList.remove('active');
+    sidebar.classList.remove('active');
+    document.body.style.overflow = '';
+  } else {
+    overlay.classList.add('active');
+    sidebar.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+// ==================== CHECKOUT ====================
+function goToCheckout() {
+  if (cart.length === 0) {
+    showToast('Your cart is empty!', 'error');
+    return;
+  }
+  
+  toggleCart();
+  setTimeout(() => {
+    showPage('checkout');
+    renderCheckoutSummary();
+  }, 300);
+}
+
+function renderCheckoutSummary() {
+  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  const shipping = subtotal >= 50 ? 0 : 9.99;
+  const discount = promoApplied ? subtotal * promoDiscount : 0;
+  const taxable = subtotal - discount;
+  const tax = taxable * 0.08;
+  const total = taxable + tax + shipping;
+  
+  document.getElementById('checkoutItems').innerHTML = cart.map(item => `
+    <div class="order-item">
+      <img data-tag="img" src="${item.image}" alt="${item.name}" style="width:60px;height:60px;border-radius:8px;object-fit:cover">
+      <div class="order-item-info">
+        <h4>${item.name}</h4>
+        <p>Qty: ${item.qty}</p>
+      </div>
+      <div class="order-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+    </div>
+  `).join('');
+  
+  document.getElementById('checkSubtotal').textContent = `$${subtotal.toFixed(2)}`;
+  document.getElementById('checkShipping').textContent = shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`;
+  document.getElementById('checkTax').textContent = `$${tax.toFixed(2)}`;
+  document.getElementById('checkTotal').textContent = `$${total.toFixed(2)}`;
+  document.getElementById('checkoutTotalBtn').textContent = `$${total.toFixed(2)}`;
+  
+  if (promoApplied) {
+    document.getElementById('discountRow').style.display = 'flex';
+    document.getElementById('checkDiscount').textContent = `-$${discount.toFixed(2)}`;
+  }
+}
+
+function applyPromo() {
+  const code = document.getElementById('promoInput').value.trim().toUpperCase();
+  const promoCodes = {
+    'NOVA10': 0.10,
+    'FIRST20': 0.20,
+    'GADGET15': 0.15
+  };
+  
+  if (promoCodes[code]) {
+    promoApplied = true;
+    promoDiscount = promoCodes[code];
+    showToast(`Promo applied! ${promoDiscount * 100}% off`, 'success');
+    renderCheckoutSummary();
+  } else {
+    showToast('Invalid promo code', 'error');
+  }
+}
+
+// ==================== PAYMENT ====================
+function selectPayment(method, el) {
+  selectedPayment = method;
+  document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+  el.classList.add('selected');
+  
+  document.getElementById('stripeConfig').style.display = method === 'stripe' ? 'block' : 'none';
+  document.getElementById('paypalConfig').style.display = method === 'paypal' ? 'block' : 'none';
+  document.getElementById('squareConfig').style.display = method === 'square' ? 'block' : 'none';
+}
+
+function formatCardNumber(input) {
+  let value = input.value.replace(/\D/g, '');
+  value = value.replace(/(.{4})/g, '$1 ').trim();
+  input.value = value;
+}
+
+function formatExpiry(input) {
+  let value = input.value.replace(/\D/g, '');
+  if (value.length >= 2) {
+    value = value.substring(0, 2) + '/' + value.substring(2);
+  }
+  input.value = value;
+}
+
+function validateCheckoutForm() {
+  const fields = ['checkFirstName','checkLastName','checkEmail','checkAddress','checkCity','checkState','checkZip'];
+  for (const id of fields) {
+    if (!document.getElementById(id).value.trim()) {
+      showToast('Please fill in all required fields', 'error');
+      document.getElementById(id).focus();
+      return false;
+    }
+  }
+  
+  const email = document.getElementById('checkEmail').value;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast('Please enter a valid email address', 'error');
+    return false;
+  }
+  
+  return true;
+}
+
+function validatePaymentDetails() {
+  if (selectedPayment === 'stripe') {
+    const cardNum = document.getElementById('cardNumber').value.replace(/\s/g, '');
+    const expiry = document.getElementById('cardExpiry').value;
+    const cvc = document.getElementById('cardCVC').value;
+    const name = document.getElementById('cardName').value;
+    
+    if (!cardNum || cardNum.length < 13) {
+      showToast('Please enter a valid card number', 'error'); return false;
+    }
+    if (!expiry || expiry.length < 4) {
+      showToast('Please enter a valid expiry date', 'error'); return false;
+    }
+    if (!cvc || cvc.length < 3) {
+      showToast('Please enter a valid CVC', 'error'); return false;
+    }
+    if (!name.trim()) {
+      showToast('Please enter the cardholder name', 'error'); return false;
+    }
+  }
+  
+  if (selectedPayment === 'square') {
+    const cardNum = document.getElementById('sqCardNumber').value.replace(/\s/g, '');
+    const expiry = document.getElementById('sqCardExpiry').value;
+    const cvv = document.getElementById('sqCardCVV').value;
+    
+    if (!cardNum || cardNum.length < 13) {
+      showToast('Please enter a valid card number', 'error'); return false;
+    }
+    if (!expiry || expiry.length < 4) {
+      showToast('Please enter a valid expiry date', 'error'); return false;
+    }
+    if (!cvv || cvv.length < 3) {
+      showToast('Please enter a valid CVV', 'error'); return false;
+    }
+  }
+  
+  return true;
+}
+
+async function placeOrder() {
+  if (!validateCheckoutForm()) return;
+  if (!validatePaymentDetails()) return;
+  
+  const btn = document.getElementById('placeOrderBtn');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<span class="loading-spinner"></span> Processing...';
+  btn.disabled = true;
+  
+  try {
+    if (selectedPayment === 'stripe') {
+      await processStripePayment();
+    } else if (selectedPayment === 'paypal') {
+      await processPayPalPayment();
+    } else if (selectedPayment === 'square') {
+      await processSquarePayment();
+    }
+    
+    const orderNum = 'NG-' + Date.now().toString().slice(-6);
+    document.getElementById('orderNumber').textContent = orderNum;
+    
+    cart = [];
+    saveCart();
+    updateCartUI();
+    promoApplied = false;
+    promoDiscount = 0;
+    
+    showPage('success');
+    showToast('Order placed successfully!', 'success');
+    
+  } catch (error) {
+    showToast(error.message || 'Payment failed. Please try again.', 'error');
+  } finally {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+}
+
+async function processStripePayment() {
+  const publicKey = document.getElementById('stripePublicKey').value.trim();
+  const secretKey = document.getElementById('stripeSecretKey').value.trim();
+  
+  if (publicKey && secretKey) {
+    // Real Stripe API integration
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    const discount = promoApplied ? subtotal * promoDiscount : 0;
+    const taxable = subtotal - discount;
+    const tax = taxable * 0.08;
+    const shipping = subtotal >= 50 ? 0 : 9.99;
+    const total = Math.round((taxable + tax + shipping) * 100); // Stripe expects cents
+    
+    const cardNum = document.getElementById('cardNumber').value.replace(/\s/g, '');
+    const expiry = document.getElementById('cardExpiry').value.split('/');
+    const cvc = document.getElementById('cardCVC').value;
+    
+    // Create payment method
+    const pmResponse = await fetch('https://api.stripe.com/v1/payment_methods', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + secretKey,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({
+        'type': 'card',
+        'card[number]': cardNum,
+        'card[exp_month]': expiry[0],
+        'card[exp_year]': '20' + expiry[1],
+        'card[cvc]': cvc
+      })
+    });
+    
+    const pmData = await pmResponse.json();
+    if (pmData.error) throw new Error(pmData.error.message);
+    
+    // Create payment intent
+    const piResponse = await fetch('https://api.stripe.com/v1/payment_intents', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + secretKey,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({
+        'amount': total.toString(),
+        'currency': 'usd',
+        'payment_method': pmData.id,
+        'confirm': 'true',
+        'description': 'NovaGadget Order',
+        'receipt_email': document.getElementById('checkEmail').value
+      })
+    });
+    
+    const piData = await piResponse.json();
+    if (piData.error) throw new Error(piData.error.message);
+    if (piData.status !== 'succeeded') throw new Error('Payment not completed. Status: ' + piData.status);
+    
+    return piData;
+  } else {
+    // Demo mode
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    return { status: 'succeeded', id: 'pi_demo_' + Date.now() };
+  }
+}
+
+async function processPayPalPayment() {
+  const clientId = document.getElementById('paypalClientId').value.trim();
+  const secret = document.getElementById('paypalSecret').value.trim();
+  
+  if (clientId && secret) {
+    // Real PayPal API integration
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    const discount = promoApplied ? subtotal * promoDiscount : 0;
+    const taxable = subtotal - discount;
+    const tax = taxable * 0.08;
+    const shipping = subtotal >= 50 ? 0 : 9.99;
+    const total = (taxable + tax + shipping).toFixed(2);
+    
+    // Get access token
+    const authResponse = await fetch('https://api-m.sandbox.paypal.com/v1/oauth2/token', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Basic ' + btoa(clientId + ':' + secret),
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'grant_type=client_credentials'
+    });
+    
+    const authData = await authResponse.json();
+    if (authData.error) throw new Error(authData.error_description || 'PayPal auth failed');
+    
+    // Create order
+    const orderResponse = await fetch('https://api-m.sandbox.paypal.com/v2/checkout/orders', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + authData.access_token,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        intent: 'CAPTURE',
+        purchase_units: [{
+          amount: {
+            currency_code: 'USD',
+            value: total
+          },
+          description: 'NovaGadget Order'
+        }]
+      })
+    });
+    
+    const orderData = await orderResponse.json();
+    if (orderData.error) throw new Error(orderData.message || 'PayPal order creation failed');
+    
+    // In a real app, redirect to PayPal approval URL
+    const approvalLink = orderData.links?.find(l => l.rel === 'approve');
+    if (approvalLink) {
+      showToast('Redirecting to PayPal...', 'info');
+      // For MVP demo, we simulate approval
+      await new Promise(resolve => setTimeout(resolve, 1500));
+    }
+    
+    return orderData;
+  } else {
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    return { status: 'COMPLETED', id: 'PAYPAL_DEMO_' + Date.now() };
+  }
+}
+
+async function processSquarePayment() {
+  const appId = document.getElementById('squareAppId').value.trim();
+  const accessToken = document.getElementById('squareAccessToken').value.trim();
+  const locationId = document.getElementById('squareLocationId').value.trim();
+  
+  if (appId && accessToken && locationId) {
+    // Real Square API integration
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    const discount = promoApplied ? subtotal * promoDiscount : 0;
+    const taxable = subtotal - discount;
+    const tax = taxable * 0.08;
+    const shipping = subtotal >= 50 ? 0 : 9.99;
+    const total = Math.round((taxable + tax + shipping) * 100); // Square expects cents
+    
+    const response = await fetch('https://connect.squareupsandbox.com/v2/payments', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + accessToken,
+        'Content-Type': 'application/json',
+        'Square-Version': '2024-01-18'
+      },
+      body: JSON.stringify({
+        idempotency_key: 'nova_' + Date.now(),
+        amount_money: {
+          amount: total,
+          currency: 'USD'
+        },
+        source_id: 'EXTERNAL',
+        location_id: locationId,
+        note: 'NovaGadget Order',
+        buyer_email_address: document.getElementById('checkEmail').value
+      })
+    });
+    
+    const data = await response.json();
+    if (data.errors) throw new Error(data.errors[0].detail || 'Square payment failed');
+    
+    return data;
+  } else {
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    return { status: 'COMPLETED', id: 'SQ_DEMO_' + Date.now() };
+  }
+}
+
+function continueShopping() {
+  showPage('shop');
+}
+
+// ==================== SEARCH ====================
+function toggleSearch() {
+  const overlay = document.getElementById('searchOverlay');
+  overlay.classList.toggle('active');
+  if (overlay.classList.contains('active')) {
+    document.getElementById('searchInput').focus();
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+}
+
+function handleSearch(query) {
+  const results = document.getElementById('searchResults');
+  if (!query.trim()) {
+    results.innerHTML = '<p style="padding:20px;text-align:center;color:var(--text-light);font-size:.9rem">Start typing to search gadgets...</p>';
+    return;
+  }
+  
+  const q = query.toLowerCase();
+  const matches = products.filter(p => 
+    p.name.toLowerCase().includes(q) || 
+    p.category.toLowerCase().includes(q) ||
+    p.description.toLowerCase().includes(q)
+  );
+  
+  if (matches.length === 0) {
+    results.innerHTML = '<p style="padding:20px;text-align:center;color:var(--text-light);font-size:.9rem">No products found for "' + query + '"</p>';
+    return;
+  }
+  
+  results.innerHTML = matches.map(p => `
+    <div class="search-result-item" onclick="toggleSearch();openProductModal(${p.id})">
+      <img data-tag="img" src="${p.image}" alt="${p.name}" style="width:50px;height:50px;border-radius:8px;object-fit:cover">
+      <div class="search-result-info">
+        <h4>${p.name}</h4>
+        <p>${p.category.replace('-', ' ')} — Nova Score: ${p.novaScore}</p>
+      </div>
+      <span class="search-result-price">$${p.price.toFixed(2)}</span>
+    </div>
+  `).join('');
+}
+
+// ==================== AUTH ====================
+function toggleAuth() {
+  const modal = document.getElementById('authModal');
+  modal.classList.toggle('active');
+  document.body.style.overflow = modal.classList.contains('active') ? 'hidden' : '';
+}
+
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  if (tab === 'login') {
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('authTitle').textContent = 'Welcome Back';
+    document.getElementById('authSubtitle').textContent = 'Sign in to your NovaGadget account';
+  } else {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('registerForm').style.display = 'block';
+    document.getElementById('authTitle').textContent = 'Create Account';
+    document.getElementById('authSubtitle').textContent = 'Join the NovaGadget community';
+  }
+}
+
+function handleLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  
+  if (!email || !password) {
+    showToast('Please fill in all fields', 'error');
+    return;
+  }
+  
+  // Check localStorage for registered users
+  const users = JSON.parse(localStorage.getItem('novaUsers') || '[]');
+  const user = users.find(u => u.email === email);
+  
+  if (user && user.password === password) {
+    currentUser = { name: user.name, email: user.email };
+    localStorage.setItem('novaUser', JSON.stringify(currentUser));
+    toggleAuth();
+    showToast(`Welcome back, ${user.name}!`, 'success');
+  } else if (email && password.length >= 4) {
+    // Demo login
+    currentUser = { name: email.split('@')[0], email };
+    localStorage.setItem('novaUser', JSON.stringify(currentUser));
+    toggleAuth();
+    showToast(`Welcome, ${currentUser.name}!`, 'success');
+  } else {
+    showToast('Invalid credentials', 'error');
+  }
+}
+
+function handleRegister() {
+  const name = document.getElementById('regName').value;
+  const email = document.getElementById('regEmail').value;
+  const password = document.getElementById('regPassword').value;
+  
+  if (!name || !email || !password) {
+    showToast('Please fill in all fields', 'error');
+    return;
+  }
+  
+  if (password.length < 6) {
+    showToast('Password must be at least 6 characters', 'error');
+    return;
+  }
+  
+  const users = JSON.parse(localStorage.getItem('novaUsers') || '[]');
+  if (users.find(u => u.email === email)) {
+    showToast('An account with this email already exists', 'error');
+    return;
+  }
+  
+  users.push({ name, email, password });
+  localStorage.setItem('novaUsers', JSON.stringify(users));
+  
+  currentUser = { name, email };
+  localStorage.setItem('novaUser', JSON.stringify(currentUser));
+  
+  toggleAuth();
+  showToast(`Account created! Welcome, ${name}!`, 'success');
+}
+
+// ==================== WISHLIST ====================
+function toggleWishlist(btn) {
+  btn.classList.toggle('active');
+  if (btn.classList.contains('active')) {
+    btn.querySelector('svg').setAttribute('fill', 'currentColor');
+    showToast('Added to wishlist!', 'success');
+  } else {
+    btn.querySelector('svg').setAttribute('fill', 'none');
+    showToast('Removed from wishlist', 'info');
+  }
+}
+
+// ==================== NEWSLETTER ====================
+function handleNewsletter(e) {
+  e.preventDefault();
+  const input = e.target.querySelector('input');
+  if (input.value) {
+    showToast('Subscribed! Check your inbox for a welcome gift.', 'success');
+    input.value = '';
+  }
+}
+
+// ==================== MOBILE NAV ====================
+function toggleMobileNav() {
+  const nav = document.getElementById('mainNav');
+  nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
+  nav.style.position = 'absolute';
+  nav.style.top = '72px';
+  nav.style.left = '0';
+  nav.style.right = '0';
+  nav.style.background = 'white';
+  nav.style.flexDirection = 'column';
+  nav.style.padding = '20px 24px';
+  nav.style.boxShadow = 'var(--shadow-lg)';
+  nav.style.zIndex = '100';
+  nav.style.gap = '16px';
+}
+
+// ==================== TOAST ====================
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `
+    <span>${message}</span>
+    <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
+  `;
+  container.appendChild(toast);
+  setTimeout(() => {
+    if (toast.parentElement) {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(100px)';
+      toast.style.transition = 'all .3s ease';
+      setTimeout(() => toast.remove(), 300);
+    }
+  }, 4000);
+}
+</script>
+</body>
+</html>
