@@ -702,6 +702,9 @@
         css: gjsEditor.getCss(),
         timestamp: Date.now()
       };
+
+      console.log(data, inlineHandlersMap);
+
       localStorage.setItem(storageKey, JSON.stringify(data));
       localStorage.setItem(handlersKey, JSON.stringify(inlineHandlersMap));
       toast('success', 'Saved successfully');
